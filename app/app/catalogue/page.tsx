@@ -100,7 +100,7 @@ export default function CataloguePage() {
     setUploadingLogo(true);
     setLogoError(null);
     try {
-      const resized = await fileToResizedDataUrl(file, 200);
+      const resized = await fileToResizedDataUrl(file, 200, "png");
       setLogo(resized);
       localStorage.setItem(LOGO_KEY, resized);
     } catch {
