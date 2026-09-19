@@ -35,6 +35,16 @@ export async function updateSession(request: NextRequest) {
   const isAuthRoute = path.startsWith("/connexion") || path.startsWith("/inscription");
   const isProtected = path.startsWith("/app");
 
+  // Un utilisateur réellement connecté ne doit jamais rester coincé en mode démo : sinon
+  // lib/demo.ts (isDemo() en premier partout) continue de servir les données de démo au lieu
+  // de son vrai compte, même après une connexion réussie. On l'applique sur toute réponse
+  // renvoyée ci-dessous, y compris les redirections (qui sont des objets Response distincts).
+  const clearDemoCookie = user && isDemo;
+  function withDemoCookieCleared(res: NextResponse) {
+    if (clearDemoCookie) res.cookies.set({ name: "boutik_demo", value: "", path: "/", maxAge: 0 });
+    return res;
+  }
+
   if (isProtected && !user && !isDemo) {
     const url = request.nextUrl.clone();
     url.pathname = "/connexion";
@@ -44,8 +54,8 @@ export async function updateSession(request: NextRequest) {
   if (isAuthRoute && user) {
     const url = request.nextUrl.clone();
     url.pathname = "/app";
-    return NextResponse.redirect(url);
+    return withDemoCookieCleared(NextResponse.redirect(url));
   }
 
-  return response;
+  return withDemoCookieCleared(response);
 }
