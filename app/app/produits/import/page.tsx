@@ -52,8 +52,8 @@ export default function ImportPage() {
       <div className="space-y-4">
         <h1 className="text-xl font-extrabold text-gray-900">Importer mon stock</h1>
         <p className="text-sm text-gray-500">
-          Fichier .xlsx avec les colonnes : nom produit, prix, quantité stock, catégorie (photo
-          optionnelle).
+          Fichier .xlsx, .xls, .csv ou .ods avec les colonnes : nom produit, prix, quantité stock,
+          catégorie (photo optionnelle).
         </p>
         <ExcelUploader onParsed={setRows} />
       </div>

@@ -20,7 +20,7 @@ export function ExcelUploader({ onParsed }: { onParsed: (rows: ParsedRow[]) => v
       }
       onParsed(rows);
     } catch (e) {
-      setError("Impossible de lire ce fichier. Vérifie que c'est bien un fichier Excel (.xlsx).");
+      setError("Impossible de lire ce fichier. Formats acceptés : .xlsx, .xls, .csv, .ods.");
     } finally {
       setLoading(false);
     }
@@ -31,9 +31,9 @@ export function ExcelUploader({ onParsed }: { onParsed: (rows: ParsedRow[]) => v
       <input
         ref={inputRef}
         type="file"
-        accept=".xlsx,.xls"
+        accept=".xlsx,.xls,.csv,.ods"
         className="hidden"
-        aria-label="Choisir un fichier Excel"
+        aria-label="Choisir un fichier de stock"
         onChange={(e) => {
           const file = e.target.files?.[0];
           if (file) handleFile(file);
@@ -49,7 +49,7 @@ export function ExcelUploader({ onParsed }: { onParsed: (rows: ParsedRow[]) => v
       >
         <IconUpload className="h-8 w-8 text-brand-600" />
         <span className="text-sm font-semibold text-brand-700">
-          {loading ? "Lecture du fichier…" : "Choisir un fichier Excel (.xlsx)"}
+          {loading ? "Lecture du fichier…" : "Choisir un fichier (.xlsx, .xls, .csv, .ods)"}
         </span>
         <span className="text-xs text-gray-500">Colonnes : nom, prix, quantité, catégorie</span>
       </button>
