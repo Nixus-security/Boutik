@@ -70,6 +70,9 @@ export default function ConnexionPage() {
                 onChange={(e) => setPassword(e.target.value)}
                 placeholder="••••••••"
               />
+              <Link href="/mot-de-passe-oublie" className="block text-sm font-semibold text-brand-600">
+                Mot de passe oublié ?
+              </Link>
               {error && (
                 <p className="text-sm font-medium text-red-700" role="alert">
                   {error}
