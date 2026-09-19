@@ -35,8 +35,12 @@ create table if not exists orders (
   status text not null default 'en_attente' check (status in ('en_attente', 'paye', 'impaye')),
   payment_method text not null default 'cash' check (payment_method in ('mobile_money', 'cash')),
   created_at timestamptz not null default now(),
-  paid_at timestamptz
+  paid_at timestamptz,
+  last_relance_at timestamptz
 );
+
+-- Pour une base déjà créée avant l'ajout de cette colonne (sans effet si elle existe déjà).
+alter table orders add column if not exists last_relance_at timestamptz;
 
 -- Lignes de commande
 create table if not exists order_items (

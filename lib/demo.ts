@@ -87,6 +87,7 @@ const SEED_ORDERS: Order[] = [
     payment_method: "mobile_money",
     created_at: daysAgo(6),
     paid_at: null,
+    last_relance_at: null,
     items: [{ id: "i1", order_id: "demo-o1", product_id: "demo-p1", product_name: "Pagne wax 6 yards", quantity: 1, unit_price: 15000 }],
   },
   {
@@ -99,6 +100,7 @@ const SEED_ORDERS: Order[] = [
     payment_method: "cash",
     created_at: daysAgo(4),
     paid_at: null,
+    last_relance_at: null,
     items: [{ id: "i2", order_id: "demo-o2", product_id: "demo-p2", product_name: "Huile de coco 500ml", quantity: 2, unit_price: 3500 }],
   },
   {
@@ -111,6 +113,7 @@ const SEED_ORDERS: Order[] = [
     payment_method: "mobile_money",
     created_at: daysAgo(2),
     paid_at: daysAgo(1),
+    last_relance_at: null,
     items: [{ id: "i3", order_id: "demo-o3", product_id: "demo-p3", product_name: "Sac à main cuir", quantity: 1, unit_price: 22000 }],
   },
   {
@@ -123,6 +126,7 @@ const SEED_ORDERS: Order[] = [
     payment_method: "mobile_money",
     created_at: daysAgo(1),
     paid_at: null,
+    last_relance_at: null,
     items: [{ id: "i4", order_id: "demo-o4", product_id: "demo-p4", product_name: "Baskets unisexe 42", quantity: 1, unit_price: 18000 }],
   },
 ];

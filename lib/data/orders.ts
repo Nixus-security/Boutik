@@ -13,7 +13,8 @@ export type NewOrderInput = {
   items: { product_name: string; product_id: string | null; quantity: number; unit_price: number }[];
 };
 
-const ORDER_COLUMNS = "id, user_id, client_name, client_phone, total, status, payment_method, created_at, paid_at";
+const ORDER_COLUMNS =
+  "id, user_id, client_name, client_phone, total, status, payment_method, created_at, paid_at, last_relance_at";
 const ORDER_ITEM_COLUMNS = "id, order_id, product_id, product_name, quantity, unit_price";
 
 /** Additionne les quantités par produit (une commande peut avoir plusieurs lignes du même produit). */
@@ -59,6 +60,7 @@ export async function createOrder(rawInput: NewOrderInput): Promise<Order> {
       payment_method: input.payment_method,
       created_at: new Date().toISOString(),
       paid_at: input.status === "paye" ? new Date().toISOString() : null,
+      last_relance_at: null,
       items: input.items.map((it, i) => ({
         id: `demo-i-${Date.now()}-${i}`,
         order_id: orderId,
@@ -133,5 +135,19 @@ export async function updateOrderStatus(id: string, status: OrderStatus): Promis
 
   const supabase = createClient();
   const { error } = await supabase.from("orders").update({ status, paid_at }).eq("id", id);
+  if (error) throw error;
+}
+
+/** Enregistre qu'une relance vient d'être envoyée pour cette commande (ouverture du lien WhatsApp). */
+export async function markRelanceSent(id: string): Promise<void> {
+  const last_relance_at = new Date().toISOString();
+
+  if (isDemo()) {
+    demoStore.updateOrder(id, { last_relance_at });
+    return;
+  }
+
+  const supabase = createClient();
+  const { error } = await supabase.from("orders").update({ last_relance_at }).eq("id", id);
   if (error) throw error;
 }

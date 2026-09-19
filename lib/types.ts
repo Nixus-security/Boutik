@@ -33,6 +33,7 @@ export type Order = {
   payment_method: PaymentMethod;
   created_at: string;
   paid_at: string | null;
+  last_relance_at: string | null;
   items: OrderItem[];
 };
 
