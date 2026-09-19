@@ -162,6 +162,12 @@ export const demoStore = {
     const current = demoStore.getProducts();
     demoStore.setProducts([...current, ...newOnes]);
   },
+  decrementStock(quantities: Map<string, number>) {
+    const current = demoStore.getProducts();
+    demoStore.setProducts(
+      current.map((p) => (quantities.has(p.id) ? { ...p, stock: Math.max(0, p.stock - quantities.get(p.id)!) } : p))
+    );
+  },
   getOrders(): Order[] {
     if (typeof localStorage === "undefined") return SEED_ORDERS;
     const raw = localStorage.getItem(ORDERS_KEY);

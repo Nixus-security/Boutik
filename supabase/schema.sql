@@ -68,6 +68,18 @@ create policy "order_items: owner all" on order_items for all
   using (exists (select 1 from orders o where o.id = order_items.order_id and o.user_id = auth.uid()))
   with check (exists (select 1 from orders o where o.id = order_items.order_id and o.user_id = auth.uid()));
 
+-- Décrémente le stock d'un produit lors d'une vente (jamais sous 0).
+-- Pas de "security definer" : s'exécute avec les droits de l'appelant, donc la policy RLS
+-- "products: owner all" s'applique normalement (un utilisateur ne peut décrémenter que son stock).
+create or replace function public.decrement_product_stock(p_product_id uuid, p_quantity int)
+returns void as $$
+begin
+  update products
+  set stock = greatest(0, stock - p_quantity)
+  where id = p_product_id;
+end;
+$$ language plpgsql;
+
 -- Crée automatiquement un profil à l'inscription
 create or replace function public.handle_new_user()
 returns trigger as $$

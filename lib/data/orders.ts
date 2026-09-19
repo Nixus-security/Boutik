@@ -16,6 +16,16 @@ export type NewOrderInput = {
 const ORDER_COLUMNS = "id, user_id, client_name, client_phone, total, status, payment_method, created_at, paid_at";
 const ORDER_ITEM_COLUMNS = "id, order_id, product_id, product_name, quantity, unit_price";
 
+/** Additionne les quantités par produit (une commande peut avoir plusieurs lignes du même produit). */
+function quantitiesByProduct(items: { product_id: string | null; quantity: number }[]): Map<string, number> {
+  const map = new Map<string, number>();
+  for (const item of items) {
+    if (!item.product_id) continue;
+    map.set(item.product_id, (map.get(item.product_id) ?? 0) + item.quantity);
+  }
+  return map;
+}
+
 export async function listOrders(): Promise<Order[]> {
   if (isDemo()) return demoStore.getOrders();
 
@@ -59,6 +69,7 @@ export async function createOrder(rawInput: NewOrderInput): Promise<Order> {
       })),
     };
     demoStore.addOrder(order);
+    demoStore.decrementStock(quantitiesByProduct(input.items));
     return order;
   }
 
@@ -98,6 +109,16 @@ export async function createOrder(rawInput: NewOrderInput): Promise<Order> {
     .select(ORDER_ITEM_COLUMNS);
 
   if (itemsError) throw itemsError;
+
+  // Décrémente le stock produit par produit. Best-effort : la commande est déjà enregistrée,
+  // on ne fait pas échouer la création pour un souci sur cette étape secondaire.
+  for (const [productId, quantity] of quantitiesByProduct(input.items)) {
+    try {
+      await supabase.rpc("decrement_product_stock", { p_product_id: productId, p_quantity: quantity });
+    } catch {
+      // décrément best-effort : la commande est déjà enregistrée
+    }
+  }
 
   return { ...orderRow, items: items as OrderItem[] } as Order;
 }
