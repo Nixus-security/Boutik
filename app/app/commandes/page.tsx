@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { listOrders } from "@/lib/data/orders";
 import { formatDate, formatPrice } from "@/lib/format";
 import { useCurrency } from "@/lib/currency-context";
@@ -13,36 +14,38 @@ import { Avatar } from "@/components/ui/Avatar";
 import { IconReceipt } from "@/components/icons";
 import type { Order, OrderStatus } from "@/lib/types";
 
-const FILTERS: { value: OrderStatus | "toutes"; label: string }[] = [
-  { value: "toutes", label: "Toutes" },
-  { value: "en_attente", label: "En attente" },
-  { value: "impaye", label: "Impayées" },
-  { value: "paye", label: "Payées" },
-];
-
 export default function CommandesPage() {
   const { currency } = useCurrency();
+  const locale = useLocale();
+  const t = useTranslations("orders");
   const [orders, setOrders] = useState<Order[]>([]);
   const [filter, setFilter] = useState<OrderStatus | "toutes">("toutes");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const FILTERS: { value: OrderStatus | "toutes"; label: string }[] = [
+    { value: "toutes", label: t("filterAll") },
+    { value: "en_attente", label: t("filterPending") },
+    { value: "impaye", label: t("filterUnpaid") },
+    { value: "paye", label: t("filterPaid") },
+  ];
+
   useEffect(() => {
     listOrders()
       .then(setOrders)
-      .catch(() => setError("Impossible de charger tes commandes. Réessaie dans un instant."))
+      .catch(() => setError(t("loadError")))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   const filtered = filter === "toutes" ? orders : orders.filter((o) => o.status === filter);
 
   return (
     <div className="space-y-4 pb-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-extrabold text-gray-900">Commandes</h1>
+        <h1 className="text-xl font-extrabold text-gray-900">{t("title")}</h1>
       </div>
 
-      <ButtonLink href="/app/commandes/nouvelle">Nouvelle commande</ButtonLink>
+      <ButtonLink href="/app/commandes/nouvelle">{t("newOrder")}</ButtonLink>
 
       {error && (
         <p className="text-sm font-medium text-red-700" role="alert">
@@ -70,9 +73,9 @@ export default function CommandesPage() {
       ) : filtered.length === 0 ? (
         <EmptyState
           icon={<IconReceipt className="h-10 w-10 text-gray-400" />}
-          title="Aucune commande"
-          description="Ajoute ta première commande."
-          action={<ButtonLink href="/app/commandes/nouvelle">Nouvelle commande</ButtonLink>}
+          title={t("emptyTitle")}
+          description={t("emptyDesc")}
+          action={<ButtonLink href="/app/commandes/nouvelle">{t("newOrder")}</ButtonLink>}
         />
       ) : (
         <div className="space-y-2">
@@ -89,7 +92,7 @@ export default function CommandesPage() {
                 <StatusBadge status={o.status} />
               </div>
               <div className="mt-2 flex items-center justify-between">
-                <p className="text-xs text-gray-500">{formatDate(o.created_at)}</p>
+                <p className="text-xs text-gray-500">{formatDate(o.created_at, locale)}</p>
                 <p className="text-sm font-bold text-gray-900">{formatPrice(o.total, currency)}</p>
               </div>
             </Card>

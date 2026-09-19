@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { listProducts } from "@/lib/data/products";
 import { createOrder } from "@/lib/data/orders";
 import { formatPrice } from "@/lib/format";
@@ -15,6 +16,7 @@ type LineItem = { product_id: string | null; product_name: string; quantity: num
 export default function NouvelleCommandePage() {
   const router = useRouter();
   const { currency } = useCurrency();
+  const t = useTranslations("newOrder");
   const [products, setProducts] = useState<Product[]>([]);
   const [items, setItems] = useState<LineItem[]>([]);
   const [clientName, setClientName] = useState("");
@@ -55,7 +57,7 @@ export default function NouvelleCommandePage() {
     setError(null);
 
     if (items.length === 0) {
-      setError("Ajoute au moins un produit à la commande.");
+      setError(t("noItemsError"));
       return;
     }
 
@@ -64,7 +66,7 @@ export default function NouvelleCommandePage() {
       await createOrder({ client_name: clientName, client_phone: clientPhone, status, payment_method: paymentMethod, items });
       router.push("/app/commandes");
     } catch (e) {
-      setError(e instanceof Error ? e.message : "Erreur lors de l'enregistrement. Réessaie.");
+      setError(e instanceof Error ? e.message : t("saveError"));
     } finally {
       setSaving(false);
     }
@@ -72,23 +74,29 @@ export default function NouvelleCommandePage() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-5 pb-4" noValidate>
-      <h1 className="text-xl font-extrabold text-gray-900">Nouvelle commande</h1>
+      <h1 className="text-xl font-extrabold text-gray-900">{t("title")}</h1>
 
       <div className="space-y-3">
-        <Input label="Nom du client" required value={clientName} onChange={(e) => setClientName(e.target.value)} placeholder="Ex : Aïcha Koné" />
         <Input
-          label="Téléphone (WhatsApp)"
+          label={t("clientName")}
+          required
+          value={clientName}
+          onChange={(e) => setClientName(e.target.value)}
+          placeholder={t("clientNamePlaceholder")}
+        />
+        <Input
+          label={t("clientPhone")}
           required
           type="tel"
           value={clientPhone}
           onChange={(e) => setClientPhone(e.target.value)}
-          placeholder="Ex : 07 09 12 34 56"
+          placeholder={t("clientPhonePlaceholder")}
         />
       </div>
 
       <div>
         <label className="mb-2 block text-sm font-semibold text-gray-700" htmlFor="product-picker">
-          Produits commandés
+          {t("productsLabel")}
         </label>
         {products.length > 0 && (
           <select
@@ -101,7 +109,7 @@ export default function NouvelleCommandePage() {
             className="min-h-[44px] w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-sm"
           >
             <option value="" disabled>
-              + Ajouter un produit
+              {t("addProduct")}
             </option>
             {products.map((p) => (
               <option key={p.id} value={p.id}>
@@ -119,7 +127,7 @@ export default function NouvelleCommandePage() {
                 <button
                   type="button"
                   onClick={() => updateQuantity(i, item.quantity - 1)}
-                  aria-label={`Diminuer la quantité de ${item.product_name}`}
+                  aria-label={t("decreaseAria", { name: item.product_name })}
                   className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-600 active:bg-gray-200"
                 >
                   −
@@ -130,7 +138,7 @@ export default function NouvelleCommandePage() {
                 <button
                   type="button"
                   onClick={() => updateQuantity(i, item.quantity + 1)}
-                  aria-label={`Augmenter la quantité de ${item.product_name}`}
+                  aria-label={t("increaseAria", { name: item.product_name })}
                   className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-600 active:bg-gray-200"
                 >
                   +
@@ -143,27 +151,31 @@ export default function NouvelleCommandePage() {
 
       <div>
         <p className="mb-2 text-sm font-semibold text-gray-700" id="payment-method-label">
-          Moyen de paiement
+          {t("paymentMethod")}
         </p>
         <div className="grid grid-cols-2 gap-2" role="group" aria-labelledby="payment-method-label">
-          <ChoiceButton active={paymentMethod === "mobile_money"} onClick={() => setPaymentMethod("mobile_money")} label="Mobile Money" />
-          <ChoiceButton active={paymentMethod === "cash"} onClick={() => setPaymentMethod("cash")} label="Cash" />
+          <ChoiceButton
+            active={paymentMethod === "mobile_money"}
+            onClick={() => setPaymentMethod("mobile_money")}
+            label={t("mobileMoney")}
+          />
+          <ChoiceButton active={paymentMethod === "cash"} onClick={() => setPaymentMethod("cash")} label={t("cash")} />
         </div>
       </div>
 
       <div>
         <p className="mb-2 text-sm font-semibold text-gray-700" id="payment-status-label">
-          Statut du paiement
+          {t("paymentStatus")}
         </p>
         <div className="grid grid-cols-3 gap-2" role="group" aria-labelledby="payment-status-label">
-          <ChoiceButton active={status === "en_attente"} onClick={() => setStatus("en_attente")} label="En attente" />
-          <ChoiceButton active={status === "paye"} onClick={() => setStatus("paye")} label="Payé" />
-          <ChoiceButton active={status === "impaye"} onClick={() => setStatus("impaye")} label="Impayé" />
+          <ChoiceButton active={status === "en_attente"} onClick={() => setStatus("en_attente")} label={t("pending")} />
+          <ChoiceButton active={status === "paye"} onClick={() => setStatus("paye")} label={t("paid")} />
+          <ChoiceButton active={status === "impaye"} onClick={() => setStatus("impaye")} label={t("unpaid")} />
         </div>
       </div>
 
       <div className="flex items-center justify-between rounded-xl bg-brand-50 px-4 py-3">
-        <span className="text-sm font-semibold text-brand-800">Total</span>
+        <span className="text-sm font-semibold text-brand-800">{t("total")}</span>
         <span className="text-lg font-extrabold text-brand-800">{formatPrice(total, currency)}</span>
       </div>
 
@@ -180,7 +192,7 @@ export default function NouvelleCommandePage() {
           )}
 
           <Button type="submit" loading={saving}>
-            Enregistrer la commande
+            {t("submit")}
           </Button>
         </div>
       </div>

@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { passwordSchema } from "@/lib/schemas";
 import { Button } from "@/components/ui/Button";
@@ -14,6 +15,7 @@ type Status = "checking" | "ready" | "invalid";
 
 export default function ReinitialiserMotDePassePage() {
   const router = useRouter();
+  const t = useTranslations("resetPassword");
   const [status, setStatus] = useState<Status>("checking");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -56,7 +58,7 @@ export default function ReinitialiserMotDePassePage() {
     const supabase = createClient();
     const { error } = await supabase.auth.updateUser({ password: parsed.data });
     if (error) {
-      setError("Impossible de mettre à jour le mot de passe. Réessaie.");
+      setError(t("error"));
       setLoading(false);
       return;
     }
@@ -71,33 +73,33 @@ export default function ReinitialiserMotDePassePage() {
 
         <div className="mx-auto mt-10 w-full max-w-md">
           <Card className="p-6">
-            {status === "checking" && <p className="text-sm text-gray-500">Vérification du lien…</p>}
+            {status === "checking" && <p className="text-sm text-gray-500">{t("checking")}</p>}
 
             {status === "invalid" && (
               <>
-                <h1 className="text-2xl font-extrabold text-gray-900">Lien invalide ou expiré</h1>
-                <p className="mt-2 text-sm text-gray-600">Demande un nouveau lien de réinitialisation.</p>
+                <h1 className="text-2xl font-extrabold text-gray-900">{t("invalidTitle")}</h1>
+                <p className="mt-2 text-sm text-gray-600">{t("invalidBody")}</p>
                 <Link
                   href="/mot-de-passe-oublie"
                   className="mt-4 inline-block text-sm font-semibold text-brand-600"
                 >
-                  Recommencer
+                  {t("restart")}
                 </Link>
               </>
             )}
 
             {status === "ready" && !done && (
               <>
-                <h1 className="text-2xl font-extrabold text-gray-900">Nouveau mot de passe</h1>
+                <h1 className="text-2xl font-extrabold text-gray-900">{t("newPasswordTitle")}</h1>
                 <form onSubmit={handleSubmit} className="mt-6 space-y-4" noValidate>
                   <Input
-                    label="Nouveau mot de passe"
+                    label={t("newPassword")}
                     type="password"
                     required
                     minLength={6}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="6 caractères minimum"
+                    placeholder={t("newPasswordPlaceholder")}
                   />
                   {error && (
                     <p className="text-sm font-medium text-red-700" role="alert">
@@ -105,7 +107,7 @@ export default function ReinitialiserMotDePassePage() {
                     </p>
                   )}
                   <Button type="submit" loading={loading}>
-                    Valider
+                    {t("submit")}
                   </Button>
                 </form>
               </>
@@ -113,10 +115,10 @@ export default function ReinitialiserMotDePassePage() {
 
             {status === "ready" && done && (
               <>
-                <h1 className="text-2xl font-extrabold text-gray-900">Mot de passe mis à jour</h1>
-                <p className="mt-2 text-sm text-gray-600">Tu peux maintenant te connecter.</p>
+                <h1 className="text-2xl font-extrabold text-gray-900">{t("doneTitle")}</h1>
+                <p className="mt-2 text-sm text-gray-600">{t("doneBody")}</p>
                 <Button className="mt-4" onClick={() => router.push("/connexion")}>
-                  Aller à la connexion
+                  {t("goToLogin")}
                 </Button>
               </>
             )}

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { getAccount, updateAccount, changePassword } from "@/lib/data/profile";
 import { createClient } from "@/lib/supabase/client";
 import { isDemo } from "@/lib/demo";
@@ -15,16 +16,13 @@ import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 
-const planLabels: Record<PlanSlug, string> = {
-  gratuit: "Gratuit",
-  essentiel: "Essentiel",
-  pro: "Pro",
-};
-
 export default function ComptePage() {
   const router = useRouter();
   const demo = isDemo();
   const { setCurrency: setSharedCurrency } = useCurrency();
+  const t = useTranslations("account");
+  const tPlans = useTranslations("plans");
+  const tCurrency = useTranslations("currency");
 
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState<string | null>(null);
@@ -50,7 +48,7 @@ export default function ComptePage() {
         setCurrency(account.currency);
         setPlan(account.plan);
       })
-      .catch(() => setProfileError("Impossible de charger ton compte. Réessaie dans un instant."))
+      .catch(() => setProfileError(t("loadError")))
       .finally(() => setLoading(false));
   }, []);
 
@@ -60,7 +58,7 @@ export default function ComptePage() {
     setProfileSaved(false);
 
     if (!businessName.trim()) {
-      setProfileError("Le nom de la boutique est requis.");
+      setProfileError(t("businessNameRequired"));
       return;
     }
 
@@ -70,7 +68,7 @@ export default function ComptePage() {
       setSharedCurrency(currency);
       setProfileSaved(true);
     } catch {
-      setProfileError("Impossible d'enregistrer ces informations. Réessaie.");
+      setProfileError(t("saveError"));
     } finally {
       setSavingProfile(false);
     }
@@ -93,7 +91,7 @@ export default function ComptePage() {
       setNewPassword("");
       setPasswordSaved(true);
     } catch {
-      setPasswordError("Impossible de changer le mot de passe. Réessaie.");
+      setPasswordError(t("passwordError"));
     } finally {
       setSavingPassword(false);
     }
@@ -120,37 +118,35 @@ export default function ComptePage() {
 
   return (
     <div className="space-y-4 pb-4">
-      <h1 className="text-xl font-extrabold text-gray-900">Mon compte</h1>
+      <h1 className="text-xl font-extrabold text-gray-900">{t("title")}</h1>
 
       <Card>
         <form onSubmit={handleProfileSubmit} className="space-y-4">
-          <p className="text-sm font-semibold text-gray-700">Ma boutique</p>
+          <p className="text-sm font-semibold text-gray-700">{t("shopSection")}</p>
 
           {email && (
-            <p className="text-sm text-gray-500">
-              Connecté avec <span className="font-medium text-gray-700">{email}</span>
-            </p>
+            <p className="text-sm text-gray-500">{t("connectedAs", { email })}</p>
           )}
 
           <Input
-            label="Nom de la boutique"
+            label={t("businessName")}
             value={businessName}
             onChange={(e) => setBusinessName(e.target.value)}
-            placeholder="Ex : Chez Aïcha"
+            placeholder={t("businessNamePlaceholder")}
             required
           />
 
           <Input
-            label="Téléphone (optionnel)"
+            label={t("phone")}
             type="tel"
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
-            placeholder="Ex : 07 09 12 34 56"
+            placeholder={t("phonePlaceholder")}
           />
 
           <div>
             <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="currency-select">
-              Devise
+              {t("currency")}
             </label>
             <select
               id="currency-select"
@@ -160,13 +156,11 @@ export default function ComptePage() {
             >
               {CURRENCIES.map((c) => (
                 <option key={c.code} value={c.code}>
-                  {c.label}
+                  {tCurrency(c.code)}
                 </option>
               ))}
             </select>
-            <p className="mt-1 text-xs text-gray-500">
-              S'applique aux prix affichés dans l'app et sur ton catalogue.
-            </p>
+            <p className="mt-1 text-xs text-gray-500">{t("currencyHint")}</p>
           </div>
 
           {profileError && (
@@ -176,12 +170,12 @@ export default function ComptePage() {
           )}
           {profileSaved && (
             <p className="text-sm font-medium text-brand-700" role="status">
-              Informations enregistrées.
+              {t("saved")}
             </p>
           )}
 
           <Button type="submit" loading={savingProfile}>
-            Enregistrer
+            {t("save")}
           </Button>
         </form>
       </Card>
@@ -189,14 +183,14 @@ export default function ComptePage() {
       {!demo && (
         <Card>
           <form onSubmit={handlePasswordSubmit} className="space-y-4">
-            <p className="text-sm font-semibold text-gray-700">Mot de passe</p>
+            <p className="text-sm font-semibold text-gray-700">{t("passwordSection")}</p>
 
             <Input
-              label="Nouveau mot de passe"
+              label={t("newPassword")}
               type="password"
               value={newPassword}
               onChange={(e) => setNewPassword(e.target.value)}
-              placeholder="6 caractères minimum"
+              placeholder={t("newPasswordPlaceholder")}
               minLength={6}
               required
             />
@@ -208,24 +202,24 @@ export default function ComptePage() {
             )}
             {passwordSaved && (
               <p className="text-sm font-medium text-brand-700" role="status">
-                Mot de passe mis à jour.
+                {t("passwordSaved")}
               </p>
             )}
 
             <Button type="submit" variant="secondary" loading={savingPassword}>
-              Changer le mot de passe
+              {t("changePassword")}
             </Button>
           </form>
         </Card>
       )}
 
       <Card className="space-y-3">
-        <p className="text-sm font-semibold text-gray-700">Abonnement</p>
+        <p className="text-sm font-semibold text-gray-700">{t("subscriptionSection")}</p>
         <p className="text-sm text-gray-600">
-          Forfait actuel : <span className="font-bold text-gray-900">{planLabels[plan]}</span>
+          {t("currentPlan", { plan: tPlans(plan) })}
         </p>
         <ButtonLink href="/tarifs" variant="secondary">
-          Voir les tarifs
+          {t("seePricing")}
         </ButtonLink>
       </Card>
 
@@ -234,7 +228,7 @@ export default function ComptePage() {
         onClick={handleLogout}
         className="min-h-[44px] w-full rounded-xl px-4 py-3 text-center text-sm font-semibold text-red-700"
       >
-        Se déconnecter
+        {t("logout")}
       </button>
     </div>
   );

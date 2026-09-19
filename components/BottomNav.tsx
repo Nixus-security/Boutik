@@ -2,23 +2,28 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { IconClock, IconHome, IconImage, IconPlus, IconReceipt } from "@/components/icons";
 
 const items = [
-  { href: "/app", label: "Accueil", icon: IconHome },
-  { href: "/app/catalogue", label: "Catalogue", icon: IconImage },
-  { href: "/app/commandes", label: "Commandes", icon: IconReceipt },
-  { href: "/app/relances", label: "Relances", icon: IconClock },
+  { href: "/app", labelKey: "home" as const, icon: IconHome },
+  { href: "/app/catalogue", labelKey: "catalogue" as const, icon: IconImage },
+  { href: "/app/commandes", labelKey: "orders" as const, icon: IconReceipt },
+  { href: "/app/relances", labelKey: "reminders" as const, icon: IconClock },
 ];
 
 export function BottomNav() {
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   return (
-    <nav aria-label="Navigation principale" className="fixed bottom-0 left-0 right-0 z-20 border-t border-gray-100 bg-white pb-[env(safe-area-inset-bottom)]">
+    <nav
+      aria-label={t("mainNav")}
+      className="fixed bottom-0 left-0 right-0 z-20 border-t border-gray-100 bg-white pb-[env(safe-area-inset-bottom)]"
+    >
       <Link
         href="/app/produits/nouveau"
-        aria-label="Nouveau produit"
+        aria-label={t("newProduct")}
         className="absolute left-1/2 top-0 z-30 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-brand-500 text-white shadow-lg ring-4 ring-white active:bg-brand-600"
       >
         <IconPlus className="h-6 w-6" />
@@ -36,7 +41,7 @@ export function BottomNav() {
                 }`}
               >
                 <item.icon className="h-5 w-5" />
-                {item.label}
+                {t(item.labelKey)}
               </Link>
             </li>
           );

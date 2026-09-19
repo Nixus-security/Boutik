@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { listProducts } from "@/lib/data/products";
 import { getAccount } from "@/lib/data/profile";
 import { formatPrice } from "@/lib/format";
@@ -34,6 +35,10 @@ const BORDER_IDS = Object.keys(BORDERS) as BorderId[];
 
 export default function CataloguePage() {
   const { currency } = useCurrency();
+  const t = useTranslations("catalogue");
+  const tThemes = useTranslations("catalogue.themes");
+  const tShapes = useTranslations("catalogue.shapeLabels");
+  const tBorders = useTranslations("catalogue.borderLabels");
   const [products, setProducts] = useState<Product[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [format, setFormat] = useState<Format>("story");
@@ -81,9 +86,9 @@ export default function CataloguePage() {
         setProducts(p);
         setSelected(new Set(p.map((x) => x.id)));
       })
-      .catch(() => setError("Impossible de charger tes produits. Réessaie dans un instant."))
+      .catch(() => setError(t("loadError")))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   useEffect(() => {
     localStorage.setItem(STYLE_KEY, JSON.stringify({ theme, shape, border }));
@@ -106,7 +111,7 @@ export default function CataloguePage() {
       setLogo(resized);
       localStorage.setItem(LOGO_KEY, resized);
     } catch {
-      setLogoError("Impossible d'utiliser cette image. Essaie un autre fichier.");
+      setLogoError(t("logoError"));
     } finally {
       setUploadingLogo(false);
     }
@@ -144,12 +149,12 @@ export default function CataloguePage() {
       })
       .then((blob) => setImageBlob(blob))
       .catch((e) => {
-        if (e.name !== "AbortError") setError("Impossible de générer l'aperçu. Réessaie.");
+        if (e.name !== "AbortError") setError(t("generateError"));
       })
       .finally(() => setGenerating(false));
 
     return () => controller.abort();
-  }, [products, selected, format, theme, shape, border, logo, businessName, currency]);
+  }, [products, selected, format, theme, shape, border, logo, businessName, currency, t]);
 
   useEffect(() => {
     if (!imageBlob) {
@@ -220,9 +225,9 @@ export default function CataloguePage() {
     return (
       <EmptyState
         icon={<IconImage className="h-10 w-10 text-gray-400" />}
-        title="Pas encore de produits"
-        description="Importe ton stock pour générer ton premier catalogue."
-        action={<ButtonLink href="/app/produits/import">Importer un fichier Excel</ButtonLink>}
+        title={t("emptyTitle")}
+        description={t("emptyDesc")}
+        action={<ButtonLink href="/app/produits/import">{t("emptyAction")}</ButtonLink>}
       />
     );
   }
@@ -230,9 +235,9 @@ export default function CataloguePage() {
   return (
     <div className="space-y-4 pb-4">
       <div className="flex items-center justify-between">
-        <h1 className="text-xl font-extrabold text-gray-900">Mon catalogue</h1>
+        <h1 className="text-xl font-extrabold text-gray-900">{t("title")}</h1>
         <Link href="/app/produits" className="text-sm font-semibold text-brand-700 underline">
-          Voir mes produits
+          {t("seeProducts")}
         </Link>
       </div>
 
@@ -243,15 +248,15 @@ export default function CataloguePage() {
       )}
 
       <div className="flex gap-2" role="group" aria-label="Format du catalogue">
-        <FormatButton active={format === "story"} onClick={() => setFormat("story")} label="Statut (9:16)" />
-        <FormatButton active={format === "liste"} onClick={() => setFormat("liste")} label="Catalogue classique" />
+        <FormatButton active={format === "story"} onClick={() => setFormat("story")} label={t("formatStory")} />
+        <FormatButton active={format === "liste"} onClick={() => setFormat("liste")} label={t("formatClassic")} />
       </div>
 
       <div className="overflow-hidden rounded-2xl border border-gray-200 bg-white">
         {imageUrl ? (
           <img
             src={imageUrl}
-            alt={`Catalogue ${businessName} : ${selected.size} produit(s) avec prix, prêt pour WhatsApp`}
+            alt={t("previewAlt", { business: businessName, count: selected.size })}
             className={format === "story" ? "mx-auto max-h-[480px]" : "w-full"}
           />
         ) : (
@@ -260,18 +265,18 @@ export default function CataloguePage() {
       </div>
 
       <div className="space-y-4 rounded-2xl border border-gray-100 bg-white p-3">
-        <p className="text-sm font-semibold text-gray-700">Personnaliser le design</p>
+        <p className="text-sm font-semibold text-gray-700">{t("customize")}</p>
 
         <div>
-          <p className="mb-2 text-xs font-medium text-gray-500">Couleurs</p>
-          <div className="flex flex-wrap gap-2" role="group" aria-label="Couleur du catalogue">
+          <p className="mb-2 text-xs font-medium text-gray-500">{t("colors")}</p>
+          <div className="flex flex-wrap gap-2" role="group" aria-label={t("colors")}>
             {THEME_IDS.map((id) => (
               <button
                 key={id}
                 onClick={() => setTheme(id)}
                 aria-pressed={theme === id}
-                aria-label={CATALOGUE_THEMES[id].label}
-                title={CATALOGUE_THEMES[id].label}
+                aria-label={tThemes(id)}
+                title={tThemes(id)}
                 className={`flex h-11 w-11 items-center justify-center rounded-full border-2 ${
                   theme === id ? "border-gray-900" : "border-transparent"
                 }`}
@@ -287,31 +292,31 @@ export default function CataloguePage() {
         </div>
 
         <div>
-          <p className="mb-2 text-xs font-medium text-gray-500">Forme des cadres</p>
-          <div className="flex gap-2" role="group" aria-label="Forme des cadres">
+          <p className="mb-2 text-xs font-medium text-gray-500">{t("shapes")}</p>
+          <div className="flex gap-2" role="group" aria-label={t("shapes")}>
             {SHAPE_IDS.map((id) => (
-              <ChoiceChip key={id} active={shape === id} onClick={() => setShape(id)} label={SHAPES[id].label} />
+              <ChoiceChip key={id} active={shape === id} onClick={() => setShape(id)} label={tShapes(id)} />
             ))}
           </div>
         </div>
 
         <div>
-          <p className="mb-2 text-xs font-medium text-gray-500">Bordure</p>
-          <div className="flex gap-2" role="group" aria-label="Bordure des cadres">
+          <p className="mb-2 text-xs font-medium text-gray-500">{t("borders")}</p>
+          <div className="flex gap-2" role="group" aria-label={t("borders")}>
             {BORDER_IDS.map((id) => (
-              <ChoiceChip key={id} active={border === id} onClick={() => setBorder(id)} label={BORDERS[id].label} />
+              <ChoiceChip key={id} active={border === id} onClick={() => setBorder(id)} label={tBorders(id)} />
             ))}
           </div>
         </div>
 
         <div>
-          <p className="mb-2 text-xs font-medium text-gray-500">Mon logo</p>
+          <p className="mb-2 text-xs font-medium text-gray-500">{t("logo")}</p>
           <input
             ref={logoInputRef}
             type="file"
             accept="image/png,image/jpeg,image/webp"
             className="hidden"
-            aria-label="Choisir un logo"
+            aria-label={t("logoAria")}
             onChange={(e) => {
               const file = e.target.files?.[0];
               if (file) handleLogoChange(file);
@@ -329,14 +334,14 @@ export default function CataloguePage() {
               disabled={uploadingLogo}
               className="min-h-[44px] flex-1 rounded-xl border border-dashed border-gray-300 px-3 text-xs font-semibold text-gray-600 disabled:opacity-60"
             >
-              {uploadingLogo ? "Import…" : logo ? "Changer le logo" : "Ajouter mon logo"}
+              {uploadingLogo ? t("importing") : logo ? t("changeLogo") : t("addLogo")}
             </button>
             {logo && (
               <button
                 type="button"
                 onClick={removeLogo}
                 className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-gray-500 active:bg-gray-100"
-                aria-label="Retirer le logo"
+                aria-label={t("removeLogoAria")}
               >
                 <IconClose className="h-4 w-4" />
               </button>
@@ -352,16 +357,16 @@ export default function CataloguePage() {
 
       <div className="space-y-2">
         <Button onClick={handleDownload} disabled={!imageBlob || generating} loading={downloading}>
-          Télécharger l'image
+          {t("download")}
         </Button>
         <Button variant="secondary" onClick={handleShare} disabled={!imageBlob || generating} loading={sharing}>
-          Partager sur WhatsApp
+          {t("share")}
         </Button>
       </div>
 
       <div>
         <p className="mb-2 text-sm font-semibold text-gray-700">
-          Produits inclus ({selected.size}/{products.length})
+          {t("includedProducts", { selected: selected.size, total: products.length })}
         </p>
         <div className="space-y-2">
           {products.map((p) => (

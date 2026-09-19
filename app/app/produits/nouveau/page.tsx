@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createProducts } from "@/lib/data/products";
 import { fileToResizedDataUrl } from "@/lib/image-resize";
 import { Button } from "@/components/ui/Button";
@@ -10,6 +11,7 @@ import { IconImage } from "@/components/icons";
 
 export default function NouveauProduitPage() {
   const router = useRouter();
+  const t = useTranslations("productForm");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [name, setName] = useState("");
@@ -29,7 +31,7 @@ export default function NouveauProduitPage() {
       const resized = await fileToResizedDataUrl(file, 500);
       setPhoto(resized);
     } catch {
-      setPhotoError("Impossible d'utiliser cette image. Essaie un autre fichier.");
+      setPhotoError(t("photoError"));
     } finally {
       setUploadingPhoto(false);
     }
@@ -42,7 +44,7 @@ export default function NouveauProduitPage() {
     const priceValue = Number(price);
     const stockValue = Number(stock);
     if (!name.trim() || !Number.isFinite(priceValue) || priceValue <= 0) {
-      setError("Vérifie le nom et le prix du produit.");
+      setError(t("validationError"));
       return;
     }
 
@@ -59,7 +61,7 @@ export default function NouveauProduitPage() {
       ]);
       router.push("/app/produits");
     } catch {
-      setError("Impossible d'enregistrer ce produit. Réessaie.");
+      setError(t("saveError"));
     } finally {
       setSaving(false);
     }
@@ -67,16 +69,16 @@ export default function NouveauProduitPage() {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4 pb-4">
-      <h1 className="text-xl font-extrabold text-gray-900">Ajouter un produit</h1>
+      <h1 className="text-xl font-extrabold text-gray-900">{t("addTitle")}</h1>
 
       <div>
-        <p className="mb-1 block text-sm font-medium text-gray-700">Photo</p>
+        <p className="mb-1 block text-sm font-medium text-gray-700">{t("photo")}</p>
         <input
           ref={fileInputRef}
           type="file"
           accept="image/png,image/jpeg,image/webp"
           className="hidden"
-          aria-label="Choisir une photo du produit"
+          aria-label={t("photoAria")}
           onChange={(e) => {
             const file = e.target.files?.[0];
             if (file) handlePhotoChange(file);
@@ -87,7 +89,7 @@ export default function NouveauProduitPage() {
           <div className="flex h-16 w-16 shrink-0 items-center justify-center overflow-hidden rounded-xl border border-gray-200 bg-gray-50">
             {photo ? (
               // eslint-disable-next-line @next/next/no-img-element -- aperçu d'un data URL local
-              <img src={photo} alt="Aperçu du produit" className="h-full w-full object-cover" />
+              <img src={photo} alt={t("photoAlt")} className="h-full w-full object-cover" />
             ) : (
               <IconImage className="h-6 w-6 text-gray-400" aria-hidden="true" />
             )}
@@ -98,7 +100,7 @@ export default function NouveauProduitPage() {
             disabled={uploadingPhoto}
             className="min-h-[44px] flex-1 rounded-xl border border-dashed border-gray-300 px-3 text-xs font-semibold text-gray-600 disabled:opacity-60"
           >
-            {uploadingPhoto ? "Import…" : photo ? "Changer la photo" : "Ajouter une photo"}
+            {uploadingPhoto ? t("importing") : photo ? t("changePhoto") : t("addPhoto")}
           </button>
         </div>
         {photoError && (
@@ -109,41 +111,41 @@ export default function NouveauProduitPage() {
       </div>
 
       <Input
-        label="Nom du produit"
+        label={t("name")}
         value={name}
         onChange={(e) => setName(e.target.value)}
-        placeholder="Ex : Pagne wax 6 yards"
+        placeholder={t("namePlaceholder")}
         required
       />
 
       <Input
-        label="Prix"
+        label={t("price")}
         type="number"
         inputMode="decimal"
         min="0"
         step="0.01"
         value={price}
         onChange={(e) => setPrice(e.target.value)}
-        placeholder="Ex : 15000"
+        placeholder={t("pricePlaceholder")}
         required
       />
 
       <Input
-        label="Stock"
+        label={t("stock")}
         type="number"
         inputMode="numeric"
         min="0"
         step="1"
         value={stock}
         onChange={(e) => setStock(e.target.value)}
-        placeholder="Ex : 10"
+        placeholder={t("stockPlaceholder")}
       />
 
       <Input
-        label="Catégorie (optionnel)"
+        label={t("category")}
         value={category}
         onChange={(e) => setCategory(e.target.value)}
-        placeholder="Ex : Vêtements"
+        placeholder={t("categoryPlaceholder")}
       />
 
       {error && (
@@ -153,7 +155,7 @@ export default function NouveauProduitPage() {
       )}
 
       <Button type="submit" loading={saving} disabled={uploadingPhoto}>
-        Enregistrer le produit
+        {t("submitAdd")}
       </Button>
     </form>
   );

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { getProductCount } from "@/lib/data/products";
 import { listOrders } from "@/lib/data/orders";
 import { formatPrice } from "@/lib/format";
@@ -13,6 +14,8 @@ import type { Order } from "@/lib/types";
 
 export default function DashboardPage() {
   const { currency } = useCurrency();
+  const t = useTranslations("dashboard");
+  const tCommon = useTranslations("common");
   const [productCount, setProductCount] = useState(0);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +27,7 @@ export default function DashboardPage() {
         setProductCount(count);
         setOrders(o);
       })
-      .catch(() => setError("Impossible de charger tes données. Réessaie dans un instant."))
+      .catch(() => setError(tCommon("genericLoadError")))
       .finally(() => setLoading(false));
   }, []);
 
@@ -34,8 +37,8 @@ export default function DashboardPage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-xl font-extrabold text-gray-900">Bonjour</h1>
-        <p className="text-sm text-gray-500">Voici l'état de ta boutique aujourd'hui.</p>
+        <h1 className="text-xl font-extrabold text-gray-900">{t("greeting")}</h1>
+        <p className="text-sm text-gray-500">{t("subtitle")}</p>
       </div>
 
       {error && (
@@ -52,7 +55,7 @@ export default function DashboardPage() {
             ) : (
               <p className="text-2xl font-extrabold text-gray-900">{productCount}</p>
             )}
-            <p className="mt-1 text-xs text-gray-500">Produits en stock</p>
+            <p className="mt-1 text-xs text-gray-500">{t("productsInStock")}</p>
           </Card>
         </Link>
         <Card>
@@ -61,28 +64,48 @@ export default function DashboardPage() {
           ) : (
             <p className="text-2xl font-extrabold text-red-600">{unpaid.length}</p>
           )}
-          <p className="mt-1 text-xs text-gray-500">Commandes impayées</p>
+          <p className="mt-1 text-xs text-gray-500">{t("unpaidOrders")}</p>
         </Card>
       </div>
 
       {!loading && unpaid.length > 0 && (
         <Card className="border-red-200 bg-red-50">
           <p className="text-sm font-semibold text-red-800">
-            {formatPrice(unpaidTotal, currency)} à récupérer auprès de {unpaid.length} client(s)
+            {t("unpaidSummary", { amount: formatPrice(unpaidTotal, currency), count: unpaid.length })}
           </p>
           <Link href="/app/relances" className="mt-2 inline-block text-sm font-semibold text-red-700 underline">
-            Voir les relances à faire →
+            {t("seeReminders")}
           </Link>
         </Card>
       )}
 
       <div>
-        <p className="mb-2 text-sm font-semibold text-gray-700">Actions rapides</p>
+        <p className="mb-2 text-sm font-semibold text-gray-700">{t("quickActions")}</p>
         <div className="space-y-2">
-          <QuickAction href="/app/produits" icon={IconBox} title="Voir mes produits" desc="Liste, prix et stock" />
-          <QuickAction href="/app/produits/import" icon={IconUpload} title="Importer mon stock" desc="Depuis un fichier Excel" />
-          <QuickAction href="/app/catalogue" icon={IconImage} title="Générer mon catalogue" desc="Prêt pour WhatsApp en 3s" />
-          <QuickAction href="/app/commandes/nouvelle" icon={IconPlus} title="Nouvelle commande" desc="Saisie manuelle rapide" />
+          <QuickAction
+            href="/app/produits"
+            icon={IconBox}
+            title={t("seeProducts")}
+            desc={t("seeProductsDesc")}
+          />
+          <QuickAction
+            href="/app/produits/import"
+            icon={IconUpload}
+            title={t("importStock")}
+            desc={t("importStockDesc")}
+          />
+          <QuickAction
+            href="/app/catalogue"
+            icon={IconImage}
+            title={t("generateCatalogue")}
+            desc={t("generateCatalogueDesc")}
+          />
+          <QuickAction
+            href="/app/commandes/nouvelle"
+            icon={IconPlus}
+            title={t("newOrder")}
+            desc={t("newOrderDesc")}
+          />
         </div>
       </div>
     </div>

@@ -3,6 +3,7 @@
 import { Suspense, useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { exitDemo } from "@/lib/demo";
 import { signupSchema } from "@/lib/schemas";
@@ -11,12 +12,6 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { SiteHeader } from "@/components/SiteHeader";
 import { IconMail } from "@/components/icons";
-
-const planLabels: Record<PlanSlug, string> = {
-  gratuit: "Gratuit",
-  essentiel: "Essentiel",
-  pro: "Pro",
-};
 
 export default function InscriptionPage() {
   return (
@@ -36,6 +31,8 @@ export default function InscriptionPage() {
 function InscriptionForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const t = useTranslations("signup");
+  const tPlans = useTranslations("plans");
   const requestedPlan = searchParams.get("plan");
   const plan: PlanSlug = PLAN_SLUGS.includes(requestedPlan as PlanSlug)
     ? (requestedPlan as PlanSlug)
@@ -66,7 +63,7 @@ function InscriptionForm() {
     });
 
     if (error) {
-      setError("Impossible de créer le compte. Réessaie dans un instant.");
+      setError(t("error"));
       setLoading(false);
       return;
     }
@@ -88,31 +85,29 @@ function InscriptionForm() {
         <span className="flex h-14 w-14 items-center justify-center rounded-full bg-brand-50 text-brand-600">
           <IconMail className="h-7 w-7" />
         </span>
-        <h1 className="mt-4 text-xl font-extrabold text-gray-900">Vérifie ta boîte mail</h1>
-        <p className="mt-2 text-sm text-gray-500">
-          On t'a envoyé un lien de confirmation à {email}. Clique dessus pour activer ton compte.
-        </p>
+        <h1 className="mt-4 text-xl font-extrabold text-gray-900">{t("sentTitle")}</h1>
+        <p className="mt-2 text-sm text-gray-500">{t("sentBody", { email })}</p>
       </div>
     );
   }
 
   return (
     <div>
-      <h1 className="text-center text-2xl font-extrabold text-gray-900">Créer mon compte</h1>
+      <h1 className="text-center text-2xl font-extrabold text-gray-900">{t("title")}</h1>
       <p className="mt-1 text-center text-sm text-gray-500">
-        {plan === "gratuit" ? "Gratuit, prêt en 1 minute." : `Forfait ${planLabels[plan]} sélectionné.`}
+        {plan === "gratuit" ? t("subtitleFree") : t("subtitlePlan", { plan: tPlans(plan) })}
       </p>
 
       <form onSubmit={handleSubmit} className="mt-8 space-y-4" noValidate>
         <Input
-          label="Nom de ta boutique"
+          label={t("businessName")}
           required
           value={businessName}
           onChange={(e) => setBusinessName(e.target.value)}
           placeholder="Ex : Chez Aïcha"
         />
         <Input
-          label="Email"
+          label={t("email")}
           type="email"
           required
           value={email}
@@ -120,7 +115,7 @@ function InscriptionForm() {
           placeholder="toi@exemple.com"
         />
         <Input
-          label="Mot de passe"
+          label={t("password")}
           type="password"
           required
           minLength={6}
@@ -134,14 +129,14 @@ function InscriptionForm() {
           </p>
         )}
         <Button type="submit" loading={loading}>
-          Créer mon compte
+          {t("submit")}
         </Button>
       </form>
 
       <p className="mt-6 text-center text-sm text-gray-500">
-        Déjà un compte ?{" "}
+        {t("haveAccount")}{" "}
         <Link href="/connexion" className="font-semibold text-brand-600">
-          Connecte-toi
+          {t("login")}
         </Link>
       </p>
     </div>

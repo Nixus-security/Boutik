@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { ExcelUploader } from "@/components/ExcelUploader";
 import { ProductTable } from "@/components/ProductTable";
 import { Button } from "@/components/ui/Button";
@@ -10,6 +11,7 @@ import type { ParsedRow } from "@/lib/excel";
 
 export default function ImportPage() {
   const router = useRouter();
+  const t = useTranslations("productImport");
   const [rows, setRows] = useState<ParsedRow[] | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -41,7 +43,7 @@ export default function ImportPage() {
       );
       router.push("/app/produits");
     } catch {
-      setError("Erreur lors de la sauvegarde. Réessaie.");
+      setError(t("saveError"));
     } finally {
       setSaving(false);
     }
@@ -50,11 +52,8 @@ export default function ImportPage() {
   if (!rows) {
     return (
       <div className="space-y-4">
-        <h1 className="text-xl font-extrabold text-gray-900">Importer mon stock</h1>
-        <p className="text-sm text-gray-500">
-          Fichier .xlsx, .xls, .csv ou .ods avec les colonnes : nom produit, prix, quantité stock,
-          catégorie (photo optionnelle).
-        </p>
+        <h1 className="text-xl font-extrabold text-gray-900">{t("title")}</h1>
+        <p className="text-sm text-gray-500">{t("subtitle")}</p>
         <ExcelUploader onParsed={setRows} />
       </div>
     );
@@ -63,9 +62,9 @@ export default function ImportPage() {
   return (
     <div className="space-y-4 pb-4">
       <div>
-        <h1 className="text-xl font-extrabold text-gray-900">Vérifie tes produits</h1>
+        <h1 className="text-xl font-extrabold text-gray-900">{t("reviewTitle")}</h1>
         <p className="text-sm text-gray-500" aria-live="polite">
-          {validCount} produit(s) prêt(s) à importer sur {rows.length}. Corrige les lignes en rouge.
+          {t("reviewSubtitle", { validCount, total: rows.length })}
         </p>
       </div>
 
@@ -84,10 +83,10 @@ export default function ImportPage() {
       <div className="fixed inset-x-0 bottom-24 z-10 mx-auto max-w-md px-4">
         <div className="space-y-2 rounded-xl bg-white p-3 shadow-lg">
           <Button onClick={handleSave} disabled={validCount === 0} loading={saving}>
-            {`Enregistrer ${validCount} produit(s)`}
+            {t("submit", { count: validCount })}
           </Button>
           <Button variant="secondary" onClick={() => setRows(null)}>
-            Recommencer
+            {t("restart")}
           </Button>
         </div>
       </div>

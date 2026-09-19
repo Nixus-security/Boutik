@@ -3,10 +3,12 @@
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { isDemo } from "@/lib/demo";
 import { BottomNav } from "@/components/BottomNav";
 import { DemoBanner } from "@/components/DemoBanner";
+import { LanguageSwitcher } from "@/components/LanguageSwitcher";
 import { CurrencyProvider } from "@/lib/currency-context";
 import { IconBox, IconSettings } from "@/components/icons";
 import logoFull from "@/public/logo-full.png";
@@ -14,6 +16,7 @@ import logoFull from "@/public/logo-full.png";
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const pathname = usePathname();
+  const t = useTranslations("nav");
 
   async function handleLogout() {
     if (!isDemo()) {
@@ -33,16 +36,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
             <Image src={logoFull} alt="Boutik" width={48} height={48} className="h-12 w-12" priority />
           </Link>
           <div className="flex items-center gap-1">
+            <LanguageSwitcher className="mr-1" />
             <Link
               href="/app/produits"
-              aria-label="Mes produits"
+              aria-label={t("myProducts")}
               className="flex h-11 w-11 items-center justify-center rounded-full text-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
             >
               <IconBox className="h-5 w-5" />
             </Link>
             <Link
               href="/app/compte"
-              aria-label="Mon compte"
+              aria-label={t("myAccount")}
               className="flex h-11 w-11 items-center justify-center rounded-full text-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
             >
               <IconSettings className="h-5 w-5" />
@@ -51,7 +55,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
               onClick={handleLogout}
               className="flex min-h-[44px] items-center rounded-full px-4 text-sm font-semibold text-gray-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
             >
-              Déconnexion
+              {t("logout")}
             </button>
           </div>
         </header>

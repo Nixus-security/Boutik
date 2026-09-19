@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { listOrders, markRelanceSent, updateOrderStatus } from "@/lib/data/orders";
 import { daysSince, formatPrice } from "@/lib/format";
 import { useCurrency } from "@/lib/currency-context";
@@ -22,6 +23,7 @@ function relancePriority(o: Order): number {
 
 export default function RelancesPage() {
   const { currency } = useCurrency();
+  const t = useTranslations("reminders");
   const [orders, setOrders] = useState<Order[]>([]);
   const [threshold, setThreshold] = useState(3);
   const [loading, setLoading] = useState(true);
@@ -34,9 +36,9 @@ export default function RelancesPage() {
     if (saved) setThreshold(Number(saved));
     listOrders()
       .then(setOrders)
-      .catch(() => setError("Impossible de charger tes commandes. Réessaie dans un instant."))
+      .catch(() => setError(t("loadError")))
       .finally(() => setLoading(false));
-  }, []);
+  }, [t]);
 
   function saveThreshold(value: number) {
     const safeValue = Number.isFinite(value) && value > 0 ? Math.floor(value) : 1;
@@ -51,7 +53,7 @@ export default function RelancesPage() {
       await updateOrderStatus(id, "paye");
       setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status: "paye" } : o)));
     } catch {
-      setError("Impossible de mettre à jour cette commande. Réessaie.");
+      setError(t("markPaidError"));
     } finally {
       setMarkingId(null);
     }
@@ -99,7 +101,7 @@ export default function RelancesPage() {
 
   return (
     <div className="space-y-4 pb-4">
-      <h1 className="text-xl font-extrabold text-gray-900">À relancer aujourd'hui</h1>
+      <h1 className="text-xl font-extrabold text-gray-900">{t("title")}</h1>
 
       {error && (
         <p className="text-sm font-medium text-red-700" role="alert">
@@ -109,7 +111,7 @@ export default function RelancesPage() {
 
       <Card className="flex items-center justify-between gap-3">
         <label className="text-sm font-medium text-gray-700" htmlFor="relance-threshold">
-          Relancer après (jours)
+          {t("thresholdLabel")}
         </label>
         <input
           id="relance-threshold"
@@ -126,8 +128,8 @@ export default function RelancesPage() {
       ) : toRelance.length === 0 ? (
         <EmptyState
           icon={<IconCheckCircle className="h-10 w-10 text-brand-500" />}
-          title="Rien à relancer"
-          description="Tous les paiements sont à jour."
+          title={t("emptyTitle")}
+          description={t("emptyDesc")}
         />
       ) : (
         <>
@@ -135,23 +137,27 @@ export default function RelancesPage() {
             <Card className="flex items-center justify-between gap-3 border-brand-200 bg-brand-50">
               <div>
                 <p className="text-sm font-semibold text-brand-800">
-                  Relance {sequence.index + 1}/{sequence.list.length} · {sequence.list[sequence.index].client_name}
+                  {t("sequenceProgress", {
+                    current: sequence.index + 1,
+                    total: sequence.list.length,
+                    name: sequence.list[sequence.index].client_name,
+                  })}
                 </p>
-                <p className="text-xs text-brand-700">Envoie le message dans WhatsApp, puis reviens ici.</p>
+                <p className="text-xs text-brand-700">{t("sequenceHint")}</p>
               </div>
               <div className="flex shrink-0 gap-2">
                 <Button variant="secondary" className="text-xs" onClick={() => setSequence(null)}>
-                  Arrêter
+                  {t("stop")}
                 </Button>
                 <Button className="text-xs" onClick={nextInSequence}>
-                  Suivant
+                  {t("next")}
                 </Button>
               </div>
             </Card>
           ) : (
             toRelance.length > 1 && (
               <Button variant="secondary" onClick={startSequence}>
-                Tout relancer ({toRelance.length})
+                {t("relaunchAll", { count: toRelance.length })}
               </Button>
             )
           )}
@@ -164,11 +170,11 @@ export default function RelancesPage() {
                     <Avatar name={o.client_name} className="h-9 w-9 text-sm" />
                     <div>
                       <p className="text-sm font-semibold text-gray-900">{o.client_name}</p>
-                      <p className="text-xs text-red-700">Impayé depuis {daysSince(o.created_at)} jour(s)</p>
+                      <p className="text-xs text-red-700">{t("unpaidSince", { days: daysSince(o.created_at) })}</p>
                       <p className="text-xs text-gray-500">
                         {o.last_relance_at
-                          ? `Relancé il y a ${daysSince(o.last_relance_at)} jour(s)`
-                          : "Jamais relancé"}
+                          ? t("remindedAgo", { days: daysSince(o.last_relance_at) })
+                          : t("neverReminded")}
                       </p>
                     </div>
                   </div>
@@ -182,7 +188,7 @@ export default function RelancesPage() {
                     onClick={() => recordRelance(o)}
                     className="flex min-h-[44px] items-center justify-center rounded-xl bg-brand-500 px-3 text-xs font-bold text-white active:bg-brand-600"
                   >
-                    Relancer
+                    {t("relaunch")}
                   </a>
                   <Button
                     variant="secondary"
@@ -190,7 +196,7 @@ export default function RelancesPage() {
                     loading={markingId === o.id}
                     onClick={() => markPaid(o.id)}
                   >
-                    Marquer payé
+                    {t("markPaid")}
                   </Button>
                 </div>
               </Card>

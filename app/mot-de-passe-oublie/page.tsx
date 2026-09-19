@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { emailSchema } from "@/lib/schemas";
 import { Button } from "@/components/ui/Button";
@@ -10,6 +11,7 @@ import { Input } from "@/components/ui/Input";
 import { SiteHeader } from "@/components/SiteHeader";
 
 export default function MotDePasseOubliePage() {
+  const t = useTranslations("forgotPassword");
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -43,13 +45,10 @@ export default function MotDePasseOubliePage() {
           <SiteHeader />
           <div className="mx-auto mt-10 w-full max-w-md">
             <Card className="p-6 text-center">
-              <h1 className="text-2xl font-extrabold text-gray-900">Vérifie tes emails</h1>
-              <p className="mt-2 text-sm text-gray-600">
-                Si un compte existe pour <span className="font-semibold">{email}</span>, un lien de
-                réinitialisation vient d'être envoyé.
-              </p>
+              <h1 className="text-2xl font-extrabold text-gray-900">{t("sentTitle")}</h1>
+              <p className="mt-2 text-sm text-gray-600">{t("sentBody", { email })}</p>
               <Link href="/connexion" className="mt-6 inline-block text-sm font-semibold text-brand-600">
-                Retour à la connexion
+                {t("backToLogin")}
               </Link>
             </Card>
           </div>
@@ -65,14 +64,12 @@ export default function MotDePasseOubliePage() {
 
         <div className="mx-auto mt-10 w-full max-w-md">
           <Card className="p-6">
-            <h1 className="text-2xl font-extrabold text-gray-900">Mot de passe oublié</h1>
-            <p className="mt-1 text-sm text-gray-500">
-              Entre ton email, on t'envoie un lien pour en choisir un nouveau.
-            </p>
+            <h1 className="text-2xl font-extrabold text-gray-900">{t("title")}</h1>
+            <p className="mt-1 text-sm text-gray-500">{t("subtitle")}</p>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4" noValidate>
               <Input
-                label="Email"
+                label={t("email")}
                 type="email"
                 required
                 value={email}
@@ -85,14 +82,14 @@ export default function MotDePasseOubliePage() {
                 </p>
               )}
               <Button type="submit" loading={loading}>
-                Envoyer le lien
+                {t("submit")}
               </Button>
             </form>
           </Card>
 
           <p className="mt-6 text-center text-sm text-gray-500">
             <Link href="/connexion" className="font-semibold text-brand-600">
-              Retour à la connexion
+              {t("backToLogin")}
             </Link>
           </p>
         </div>

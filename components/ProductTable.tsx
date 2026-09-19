@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import type { ParsedRow } from "@/lib/excel";
 import { IconClose } from "@/components/icons";
 
@@ -12,6 +13,8 @@ export function ProductTable({
   onChange: (index: number, patch: Partial<ParsedRow>) => void;
   onRemove: (index: number) => void;
 }) {
+  const t = useTranslations("productImport");
+
   return (
     <div className="space-y-3">
       {rows.map((row, i) => (
@@ -23,14 +26,14 @@ export function ProductTable({
             <input
               value={row.name}
               onChange={(e) => onChange(i, { name: e.target.value, error: e.target.value ? null : "Nom manquant" })}
-              placeholder="Nom du produit"
-              aria-label="Nom du produit"
+              placeholder={t("namePlaceholder")}
+              aria-label={t("namePlaceholder")}
               className="min-h-[44px] w-full rounded-lg border border-gray-200 px-3 py-2 text-sm font-semibold"
             />
             <button
               onClick={() => onRemove(i)}
               className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-gray-500 active:bg-gray-100"
-              aria-label="Supprimer la ligne"
+              aria-label={t("removeLineAria")}
             >
               <IconClose className="h-4 w-4" />
             </button>
@@ -38,7 +41,7 @@ export function ProductTable({
           <div className="mt-2 grid grid-cols-3 gap-2">
             <div>
               <label className="mb-1 block text-[11px] text-gray-500" htmlFor={`price-${i}`}>
-                Prix
+                {t("price")}
               </label>
               <input
                 id={`price-${i}`}
@@ -50,7 +53,7 @@ export function ProductTable({
             </div>
             <div>
               <label className="mb-1 block text-[11px] text-gray-500" htmlFor={`stock-${i}`}>
-                Stock
+                {t("stock")}
               </label>
               <input
                 id={`stock-${i}`}
@@ -62,7 +65,7 @@ export function ProductTable({
             </div>
             <div>
               <label className="mb-1 block text-[11px] text-gray-500" htmlFor={`category-${i}`}>
-                Catégorie
+                {t("category")}
               </label>
               <input
                 id={`category-${i}`}

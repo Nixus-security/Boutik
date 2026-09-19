@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { exitDemo } from "@/lib/demo";
 import { loginSchema } from "@/lib/schemas";
@@ -13,6 +14,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 
 export default function ConnexionPage() {
   const router = useRouter();
+  const t = useTranslations("login");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -33,7 +35,7 @@ export default function ConnexionPage() {
     const { error } = await supabase.auth.signInWithPassword(parsed.data);
 
     if (error) {
-      setError("Email ou mot de passe incorrect.");
+      setError(t("invalidCredentials"));
       setLoading(false);
       return;
     }
@@ -50,12 +52,12 @@ export default function ConnexionPage() {
 
         <div className="mx-auto mt-10 w-full max-w-md">
           <Card className="p-6">
-            <h1 className="text-2xl font-extrabold text-gray-900">Connexion</h1>
-            <p className="mt-1 text-sm text-gray-500">Content de te revoir.</p>
+            <h1 className="text-2xl font-extrabold text-gray-900">{t("title")}</h1>
+            <p className="mt-1 text-sm text-gray-500">{t("subtitle")}</p>
 
             <form onSubmit={handleSubmit} className="mt-6 space-y-4" noValidate>
               <Input
-                label="Email"
+                label={t("email")}
                 type="email"
                 required
                 value={email}
@@ -63,7 +65,7 @@ export default function ConnexionPage() {
                 placeholder="toi@exemple.com"
               />
               <Input
-                label="Mot de passe"
+                label={t("password")}
                 type="password"
                 required
                 value={password}
@@ -71,7 +73,7 @@ export default function ConnexionPage() {
                 placeholder="••••••••"
               />
               <Link href="/mot-de-passe-oublie" className="block text-sm font-semibold text-brand-600">
-                Mot de passe oublié ?
+                {t("forgotPassword")}
               </Link>
               {error && (
                 <p className="text-sm font-medium text-red-700" role="alert">
@@ -79,15 +81,15 @@ export default function ConnexionPage() {
                 </p>
               )}
               <Button type="submit" loading={loading}>
-                Se connecter
+                {t("submit")}
               </Button>
             </form>
           </Card>
 
           <p className="mt-6 text-center text-sm text-gray-500">
-            Pas encore de compte ?{" "}
+            {t("noAccount")}{" "}
             <Link href="/inscription" className="font-semibold text-brand-600">
-              Inscris-toi
+              {t("signup")}
             </Link>
           </p>
         </div>
