@@ -1,0 +1,578 @@
+<!doctype html>
+<html lang="fr" data-resolution="portrait">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=1080, height=1920" />
+    <title>Boutik — Import Excel & Relance WhatsApp</title>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html,
+      body {
+        width: 1080px;
+        height: 1920px;
+        overflow: hidden;
+        background: #0a0a0a;
+        font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+      }
+      #root {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+      }
+      .scene {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        will-change: transform, opacity;
+      }
+      #scene-2,
+      #scene-3,
+      #scene-4,
+      #scene-5,
+      #scene-6 {
+        opacity: 0;
+      }
+      .scene-inner {
+        width: 100%;
+        height: 100%;
+        transform-origin: 50% 50%;
+        will-change: transform;
+      }
+
+      .app-bg {
+        width: 100%;
+        height: 100%;
+        background: #f9fafb;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 130px 64px 0;
+      }
+      .app-h1 {
+        font-size: 44px;
+        font-weight: 800;
+        color: #111827;
+        width: 100%;
+        max-width: 820px;
+        margin-bottom: 12px;
+      }
+      .app-sub {
+        font-size: 24px;
+        color: #6b7280;
+        width: 100%;
+        max-width: 820px;
+        margin-bottom: 40px;
+      }
+
+      /* ---------- scene 1: hook ---------- */
+      #scene-1 .hook-bg {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(160deg, #127847 0%, #124e32 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 90px;
+        text-align: center;
+      }
+      #scene-1 .hook-text {
+        font-size: 68px;
+        font-weight: 900;
+        color: #ffffff;
+        line-height: 1.15;
+        letter-spacing: -0.02em;
+        transform-origin: 50% 50%;
+      }
+
+      /* ---------- scene 2: import - pick file ---------- */
+      .upload-box {
+        width: 100%;
+        max-width: 820px;
+        border: 3px dashed #7ce7ab;
+        background: #eefdf3;
+        border-radius: 28px;
+        padding: 72px 40px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 16px;
+        text-align: center;
+        transform-origin: 50% 50%;
+      }
+      .upload-box svg {
+        width: 56px;
+        height: 56px;
+        stroke: #129756;
+        fill: none;
+        stroke-width: 1.7;
+      }
+      .upload-label {
+        font-size: 30px;
+        font-weight: 700;
+        color: #127847;
+      }
+      .upload-caption {
+        font-size: 22px;
+        color: #6b7280;
+      }
+      #loading-label {
+        position: absolute;
+        opacity: 0;
+      }
+
+      /* ---------- scene 3: import - preview & save ---------- */
+      #scene-3 .row-count {
+        font-size: 24px;
+        color: #6b7280;
+        width: 100%;
+        max-width: 820px;
+        margin-bottom: 24px;
+      }
+      .import-row {
+        width: 100%;
+        max-width: 820px;
+        border: 2px solid #e5e7eb;
+        background: #ffffff;
+        border-radius: 20px;
+        padding: 22px 26px;
+        margin-bottom: 16px;
+        transform-origin: 50% 50%;
+      }
+      .import-row.flagged {
+        border-color: #fca5a5;
+        background: #fef2f2;
+      }
+      .import-row .row-name {
+        font-size: 28px;
+        font-weight: 700;
+        color: #111827;
+      }
+      .import-row .row-meta {
+        margin-top: 6px;
+        font-size: 22px;
+        color: #6b7280;
+      }
+      .import-row .row-error {
+        margin-top: 8px;
+        font-size: 20px;
+        font-weight: 600;
+        color: #b91c1c;
+      }
+      #scene-3 .save-btn {
+        width: 100%;
+        max-width: 820px;
+        height: 100px;
+        margin-top: 12px;
+        background: #127847;
+        color: #ffffff;
+        border-radius: 24px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 32px;
+        font-weight: 800;
+        transform-origin: 50% 50%;
+      }
+
+      /* ---------- scene 4: bridge ---------- */
+      #scene-4 .bridge-bg {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(160deg, #127847 0%, #124e32 100%);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 0 100px;
+        text-align: center;
+      }
+      #scene-4 .bridge-text {
+        font-size: 50px;
+        font-weight: 800;
+        color: #ffffff;
+        line-height: 1.2;
+        transform-origin: 50% 50%;
+      }
+
+      /* ---------- scene 5: relance ---------- */
+      .relance-card {
+        width: 100%;
+        max-width: 820px;
+        background: #ffffff;
+        border: 2px solid #f3f4f6;
+        border-radius: 28px;
+        padding: 32px;
+        box-shadow: 0 8px 24px rgba(17, 24, 39, 0.06);
+      }
+      .relance-top {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+      .relance-who {
+        display: flex;
+        align-items: center;
+        gap: 18px;
+      }
+      .relance-avatar {
+        width: 72px;
+        height: 72px;
+        border-radius: 999px;
+        background: #eefdf3;
+        color: #127847;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 28px;
+        font-weight: 800;
+      }
+      .relance-name {
+        font-size: 30px;
+        font-weight: 700;
+        color: #111827;
+      }
+      .relance-days {
+        margin-top: 4px;
+        font-size: 22px;
+        color: #b91c1c;
+        font-weight: 600;
+      }
+      .relance-amount {
+        font-size: 30px;
+        font-weight: 800;
+        color: #111827;
+      }
+      .relance-actions {
+        margin-top: 28px;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+      }
+      .relance-btn {
+        height: 84px;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 26px;
+        font-weight: 700;
+        transform-origin: 50% 50%;
+      }
+      .relance-btn.primary {
+        background: #127847;
+        color: #ffffff;
+      }
+      .relance-btn.secondary {
+        background: #f3f4f6;
+        color: #374151;
+      }
+      #scene-5 .bubble-wrap {
+        width: 100%;
+        max-width: 820px;
+        margin-top: 32px;
+        display: flex;
+        justify-content: flex-end;
+      }
+      #scene-5 .bubble {
+        max-width: 92%;
+        background: #dcf8c6;
+        border-radius: 22px 22px 4px 22px;
+        padding: 24px 28px;
+        font-size: 25px;
+        line-height: 1.4;
+        color: #0b3d19;
+        font-weight: 500;
+        opacity: 0;
+        transform-origin: 100% 0%;
+      }
+
+      /* ---------- scene 6: outro ---------- */
+      #scene-6 .outro-wrap {
+        width: 100%;
+        height: 100%;
+        background: #0a0a0a;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 44px;
+        padding: 0 90px;
+        text-align: center;
+      }
+      #scene-6 .logo-card {
+        background: #ffffff;
+        border-radius: 48px;
+        padding: 44px 60px;
+        box-shadow: 0 24px 60px rgba(0, 0, 0, 0.35);
+        transform-origin: 50% 50%;
+      }
+      #scene-6 .logo-card img {
+        width: 300px;
+        height: 300px;
+        display: block;
+      }
+      #scene-6 .tagline {
+        font-size: 34px;
+        font-weight: 700;
+        color: #f3f4f6;
+        max-width: 780px;
+      }
+    </style>
+  </head>
+  <body>
+    <div
+      id="root"
+      data-composition-id="boutik-howto"
+      data-start="0"
+      data-width="1080"
+      data-height="1920"
+      data-duration="19"
+    >
+      <!-- Scene 1: Hook -->
+      <section id="scene-1" class="scene">
+        <div class="scene-inner" id="scene-1-inner">
+          <div class="hook-bg">
+            <div class="hook-text" id="hook-text">2 trucs qui font<br />gagner du temps.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 2: Import - pick file -->
+      <section id="scene-2" class="scene">
+        <div class="scene-inner" id="scene-2-inner">
+          <div class="app-bg">
+            <div class="app-h1">Importer mon stock</div>
+            <div class="app-sub">Fichier .xlsx avec les colonnes : nom, prix, quantité, catégorie.</div>
+            <div class="upload-box" id="upload-box">
+              <svg viewBox="0 0 24 24"><path d="M12 3v12" /><path d="M7 8l5-5 5 5" /><path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2" /></svg>
+              <span class="upload-label" id="upload-label">Choisir un fichier Excel (.xlsx)</span>
+              <span class="upload-label" id="loading-label">Lecture du fichier…</span>
+              <span class="upload-caption">Colonnes : nom, prix, quantité, catégorie</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 3: Import - preview & save -->
+      <section id="scene-3" class="scene">
+        <div class="scene-inner" id="scene-3-inner">
+          <div class="app-bg" style="padding-top: 110px">
+            <div class="app-h1">Vérifie tes produits</div>
+            <div class="row-count" id="row-count">3 produit(s) prêt(s) à importer sur 4.</div>
+
+            <div class="import-row" id="row-1">
+              <div class="row-name">Pagne wax 6 yards</div>
+              <div class="row-meta">15 000 FCFA · Stock 12 · Tissus</div>
+            </div>
+            <div class="import-row flagged" id="row-2">
+              <div class="row-name" id="row-2-name"></div>
+              <div class="row-meta">3 500 FCFA · Stock 30 · Beauté</div>
+              <div class="row-error" id="row-2-error">Nom manquant</div>
+            </div>
+            <div class="import-row" id="row-3">
+              <div class="row-name">Sac à main cuir</div>
+              <div class="row-meta">22 000 FCFA · Stock 5 · Accessoires</div>
+            </div>
+
+            <div class="save-btn" id="save-btn">Enregistrer 4 produits</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 4: Bridge -->
+      <section id="scene-4" class="scene">
+        <div class="scene-inner" id="scene-4-inner">
+          <div class="bridge-bg">
+            <div class="bridge-text" id="bridge-text">Relancer un client<br />qui n'a pas payé</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 5: Relance -->
+      <section id="scene-5" class="scene">
+        <div class="scene-inner" id="scene-5-inner">
+          <div class="app-bg" style="padding-top: 160px">
+            <div class="relance-card">
+              <div class="relance-top">
+                <div class="relance-who">
+                  <div class="relance-avatar">AK</div>
+                  <div>
+                    <div class="relance-name">Aïcha Koné</div>
+                    <div class="relance-days">Impayé depuis 6 jours</div>
+                  </div>
+                </div>
+                <div class="relance-amount">15 000 FCFA</div>
+              </div>
+              <div class="relance-actions">
+                <div class="relance-btn primary" id="relancer-btn">Relancer</div>
+                <div class="relance-btn secondary">Marquer payé</div>
+              </div>
+            </div>
+            <div class="bubble-wrap">
+              <div class="bubble" id="bubble">
+                Bonjour Aïcha, petit rappel concernant votre commande de 15 000 FCFA qui reste impayée. Merci de bien vouloir régler dès que possible 🙏
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Scene 6: Outro -->
+      <section id="scene-6" class="scene">
+        <div class="scene-inner" id="scene-6-inner">
+          <div class="outro-wrap">
+            <div class="logo-card" id="logo-card">
+              <img src="assets/images/logo-full.png" alt="" />
+            </div>
+            <div class="tagline" id="outro-tag">Importe. Vends. Relance.<br />Tout depuis ton téléphone.</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Music bed: low, steady, no swells -->
+      <audio
+        id="bgm"
+        src="assets/music/happy-beats-business-moves-vol-1-by-ende-dot-app.mp3"
+        data-start="0"
+        data-duration="19"
+        data-volume="1"
+        data-track-index="20"
+        data-fx-chain="{&quot;version&quot;:1,&quot;nodes&quot;:[{&quot;type&quot;:&quot;limiter&quot;,&quot;id&quot;:&quot;n1&quot;,&quot;label&quot;:&quot;Ceiling&quot;,&quot;params&quot;:{&quot;limit&quot;:-1,&quot;attack&quot;:5,&quot;release&quot;:50,&quot;level_out&quot;:0}}]}"
+        data-automation="{&quot;version&quot;:1,&quot;lanes&quot;:[{&quot;target&quot;:&quot;volume&quot;,&quot;points&quot;:[{&quot;t&quot;:0,&quot;v&quot;:0.1},{&quot;t&quot;:1.0,&quot;v&quot;:0.32},{&quot;t&quot;:17.0,&quot;v&quot;:0.32},{&quot;t&quot;:18.6,&quot;v&quot;:0.02}]}]}"
+      ></audio>
+
+      <!-- SFX: sparse ticks per real interaction -->
+      <audio id="sfx-file-pick" src="assets/sfx/click_003.ogg" data-start="4.05" data-track-index="21" data-volume="0.8"></audio>
+      <audio id="sfx-save" src="assets/sfx/click_003.ogg" data-start="8.9" data-track-index="22" data-volume="0.8"></audio>
+      <audio id="sfx-relancer" src="assets/sfx/click_003.ogg" data-start="12.55" data-track-index="23" data-volume="0.8"></audio>
+      <audio
+        id="sfx-message"
+        src="assets/sfx/bong_001.ogg"
+        data-start="12.85"
+        data-track-index="24"
+        data-volume="0.85"
+        data-fx-chain="{&quot;version&quot;:1,&quot;nodes&quot;:[{&quot;type&quot;:&quot;reverb&quot;,&quot;id&quot;:&quot;n1&quot;,&quot;label&quot;:&quot;Soft room&quot;,&quot;params&quot;:{&quot;size&quot;:0.25,&quot;damping&quot;:0.6,&quot;wet&quot;:0.14,&quot;dry&quot;:0.88}}]}"
+      ></audio>
+    </div>
+
+    <script>
+      const tl = gsap.timeline({ paused: true, defaults: { duration: 0.6, ease: "power3.out" } });
+
+      function kenBurns(sel, start, duration, fromScale, toScale) {
+        tl.fromTo(sel, { scale: fromScale }, { scale: toScale, duration, ease: "sine.inOut" }, start);
+      }
+      kenBurns("#scene-1-inner", 0, 2.5, 1, 1.02);
+      kenBurns("#scene-2-inner", 2.2, 3.9, 1.005, 1.02);
+      kenBurns("#scene-3-inner", 5.7, 4.4, 1, 1.02);
+      kenBurns("#scene-4-inner", 9.7, 2.0, 1, 1.015);
+      kenBurns("#scene-5-inner", 11.3, 5.6, 1, 1.025);
+      kenBurns("#scene-6-inner", 16.5, 2.9, 1, 1.015);
+
+      /* ============ SCENE 1: hook (0 - 2.2s) ============ */
+      tl.fromTo("#hook-text", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "power3.out" }, 0.25);
+
+      /* ============ TRANSITION 1: crossfade @ T=2.2s ============ */
+      const T1 = 2.2;
+      tl.to("#scene-1", { opacity: 0, duration: 0.45, ease: "power2.inOut" }, T1);
+      tl.fromTo("#scene-2", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.inOut" }, T1);
+
+      /* ============ SCENE 2: import - pick file (settled ~2.65 - 5.7s) ============ */
+      gsap.set([".app-h1", ".app-sub"], { opacity: 0, y: 18 });
+      tl.to([".app-h1", ".app-sub"], { opacity: 1, y: 0, duration: 0.45, stagger: 0.08 }, T1 + 0.15);
+      gsap.set("#upload-box", { opacity: 0, scale: 0.92 });
+      tl.to("#upload-box", { opacity: 1, scale: 1, duration: 0.45, ease: "power3.out" }, T1 + 0.3);
+
+      // simulated tap — beat: 4.0s
+      tl.to("#upload-box", { scale: 0.97, duration: 0.1, ease: "power2.in" }, 4.0);
+      tl.to("#upload-box", { scale: 1, duration: 0.25, ease: "power3.out" }, 4.1);
+      // label swap — sfx-file-pick at 4.05s
+      tl.to("#upload-label", { opacity: 0, duration: 0.2 }, 4.05);
+      tl.to("#loading-label", { opacity: 1, duration: 0.2 }, 4.05);
+
+      /* ============ TRANSITION 2: crossfade @ T=5.7s ============ */
+      const T2 = 5.7;
+      tl.to("#scene-2", { opacity: 0, duration: 0.45, ease: "power2.inOut" }, T2);
+      tl.fromTo("#scene-3", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.inOut" }, T2);
+
+      /* ============ SCENE 3: import - preview & save (settled ~6.15 - 9.7s) ============ */
+      gsap.set([".app-h1", "#row-count"], { opacity: 0, y: 16 }, T2);
+      tl.to([".app-h1", "#row-count"], { opacity: 1, y: 0, duration: 0.4, stagger: 0.06 }, T2 + 0.1);
+
+      const importRows = ["#row-1", "#row-2", "#row-3"];
+      gsap.set(importRows, { opacity: 0, y: 20 });
+      tl.to(importRows, { opacity: 1, y: 0, duration: 0.4, stagger: 0.1, ease: "power3.out" }, T2 + 0.25);
+
+      // the flagged row's name types in, then the error clears (correction happens)
+      const flaggedName = "Huile de coco";
+      const flagProxy = { n: 0 };
+      const flagEl = document.getElementById("row-2-name");
+      tl.to(
+        flagProxy,
+        {
+          n: flaggedName.length,
+          duration: 0.6,
+          ease: "none",
+          onUpdate() {
+            flagEl.textContent = flaggedName.slice(0, Math.round(flagProxy.n));
+          },
+        },
+        7.6
+      );
+      tl.to("#row-2", { backgroundColor: "#ffffff", borderColor: "#e5e7eb", duration: 0.35 }, 8.25);
+      tl.to("#row-2-error", { opacity: 0, duration: 0.25 }, 8.25);
+
+      // save tap — sfx-save at 8.9s
+      tl.to("#save-btn", { scale: 0.94, duration: 0.1, ease: "power2.in" }, 8.9);
+      tl.to("#save-btn", { scale: 1, duration: 0.28, ease: "power3.out" }, 9.0);
+
+      /* ============ TRANSITION 3: crossfade @ T=9.7s ============ */
+      const T3 = 9.7;
+      tl.to("#scene-3", { opacity: 0, duration: 0.4, ease: "power2.inOut" }, T3);
+      tl.fromTo("#scene-4", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.inOut" }, T3);
+
+      /* ============ SCENE 4: bridge (settled ~10.1 - 11.3s) ============ */
+      tl.fromTo("#bridge-text", { scale: 0.85, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.4, ease: "power3.out" }, T3 + 0.15);
+
+      /* ============ TRANSITION 4: crossfade @ T=11.3s ============ */
+      const T4 = 11.3;
+      tl.to("#scene-4", { opacity: 0, duration: 0.4, ease: "power2.inOut" }, T4);
+      tl.fromTo("#scene-5", { opacity: 0 }, { opacity: 1, duration: 0.4, ease: "power2.inOut" }, T4);
+
+      /* ============ SCENE 5: relance (settled ~11.7 - 16.5s) ============ */
+      gsap.set(".relance-card", { opacity: 0, y: 20 });
+      tl.to(".relance-card", { opacity: 1, y: 0, duration: 0.5, ease: "power3.out" }, T4 + 0.15);
+
+      // relancer tap — sfx-relancer at 12.55s
+      tl.to("#relancer-btn", { scale: 0.93, duration: 0.1, ease: "power2.in" }, 12.55);
+      tl.to("#relancer-btn", { scale: 1, duration: 0.25, ease: "power3.out" }, 12.65);
+
+      // message bubble reveal — sfx-message at 12.85s
+      tl.fromTo(
+        "#bubble",
+        { opacity: 0, scale: 0.85, y: 12 },
+        { opacity: 1, scale: 1, y: 0, duration: 0.5, ease: "power3.out" },
+        12.85
+      );
+
+      /* ============ TRANSITION 5: crossfade @ T=16.5s ============ */
+      const T5 = 16.5;
+      tl.to("#scene-5", { opacity: 0, duration: 0.45, ease: "power2.inOut" }, T5);
+      tl.fromTo("#scene-6", { opacity: 0 }, { opacity: 1, duration: 0.45, ease: "power2.inOut" }, T5);
+
+      /* ============ SCENE 6: outro (settled ~16.95 - 19.0s, final scene may exit) ============ */
+      tl.fromTo("#logo-card", { scale: 0, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.5, ease: "power3.out" }, T5 + 0.3);
+      tl.fromTo("#outro-tag", { opacity: 0, y: 14 }, { opacity: 1, y: 0, duration: 0.4, ease: "power2.out" }, T5 + 0.55);
+      tl.to(["#logo-card", "#outro-tag"], { opacity: 0.9, duration: 0.35, ease: "power1.inOut" }, 18.6);
+
+      window.__timelines["boutik-howto"] = tl;
+      tl.seek(0);
+    </script>
+  </body>
+</html>
