@@ -25,6 +25,22 @@ export async function POST(req: NextRequest) {
   const width = format === "story" ? 1080 : 1200;
   const height = format === "story" ? 1920 : 1500;
   const columns = 3;
+  const padding = format === "story" ? 56 : 48;
+  const gap = 16;
+  const cardPadding = 18;
+  const cardWidth = (width - padding * 2 - gap * (columns - 1)) / columns;
+  const photoInnerWidth = cardWidth - cardPadding * 2;
+
+  // Taille de la photo calculée pour remplir l'espace vertical restant une fois
+  // le header et le footer retirés, plutôt qu'une hauteur fixe qui coupait les photos.
+  const rows = Math.max(1, Math.ceil(items.length / columns));
+  const headerHeight = format === "story" ? 135 : 126;
+  const footerHeight = 134;
+  const safetyMargin = 200; // marge pour les approximations de hauteur du header/footer
+  const textBlockHeight = 68; // nom + prix + leurs marges
+  const gridHeight = height - padding * 2 - headerHeight - footerHeight - safetyMargin;
+  const rawPhotoHeight = (gridHeight - gap * (rows - 1)) / rows - textBlockHeight;
+  const photoHeight = Math.round(Math.min(photoInnerWidth, Math.max(90, rawPhotoHeight)));
 
   return new ImageResponse(
     (
@@ -73,6 +89,7 @@ export async function POST(req: NextRequest) {
             flex: 1,
             alignContent: "flex-start",
             gap: 16,
+            overflow: "hidden",
           }}
         >
           {items.map((item, i) => (
@@ -81,7 +98,7 @@ export async function POST(req: NextRequest) {
               style={{
                 display: "flex",
                 flexDirection: "column",
-                width: (width - 48 * 2 - 16 * (columns - 1)) / columns,
+                width: cardWidth,
                 background: theme.cardBg,
                 borderRadius: shape.cardRadius,
                 border: border.width > 0 ? `${border.width}px solid ${theme.borderColor}` : "none",
@@ -92,7 +109,7 @@ export async function POST(req: NextRequest) {
                 style={{
                   display: "flex",
                   width: "100%",
-                  height: format === "story" ? 90 : 110,
+                  height: photoHeight,
                   borderRadius: shape.chipRadius,
                   background: theme.chipBg,
                   marginBottom: 12,
