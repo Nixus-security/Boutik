@@ -165,15 +165,23 @@ export default function NouvelleCommandePage() {
         <span className="text-lg font-extrabold text-brand-800">{formatPrice(total)}</span>
       </div>
 
-      {error && (
-        <p className="text-sm font-medium text-red-700" role="alert">
-          {error}
-        </p>
-      )}
+      {/* Barre fixe (pas sticky) : sur mobile le contenu tient souvent tout juste dans la
+          hauteur d'écran, donc un élément sticky n'a jamais l'occasion de se "coller" et
+          reste couvert par le bouton "+" flottant de la navigation. */}
+      <div className="h-24" aria-hidden="true" />
+      <div className="fixed inset-x-0 bottom-24 z-10 mx-auto max-w-md px-4">
+        <div className="space-y-2 rounded-xl bg-white p-3 shadow-lg">
+          {error && (
+            <p className="text-sm font-medium text-red-700" role="alert">
+              {error}
+            </p>
+          )}
 
-      <Button type="submit" loading={saving}>
-        Enregistrer la commande
-      </Button>
+          <Button type="submit" loading={saving}>
+            Enregistrer la commande
+          </Button>
+        </div>
+      </div>
     </form>
   );
 }

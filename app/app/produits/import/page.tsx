@@ -77,13 +77,19 @@ export default function ImportPage() {
         </p>
       )}
 
-      <div className="sticky bottom-20 space-y-2 rounded-xl bg-gray-50 pt-2">
-        <Button onClick={handleSave} disabled={validCount === 0} loading={saving}>
-          {`Enregistrer ${validCount} produit(s)`}
-        </Button>
-        <Button variant="secondary" onClick={() => setRows(null)}>
-          Recommencer
-        </Button>
+      {/* Barre fixe (pas sticky) : sur mobile le contenu tient souvent tout juste dans la
+          hauteur d'écran, donc un élément sticky n'a jamais l'occasion de se "coller" et
+          reste couvert par le bouton "+" flottant de la navigation. */}
+      <div className="h-32" aria-hidden="true" />
+      <div className="fixed inset-x-0 bottom-24 z-10 mx-auto max-w-md px-4">
+        <div className="space-y-2 rounded-xl bg-white p-3 shadow-lg">
+          <Button onClick={handleSave} disabled={validCount === 0} loading={saving}>
+            {`Enregistrer ${validCount} produit(s)`}
+          </Button>
+          <Button variant="secondary" onClick={() => setRows(null)}>
+            Recommencer
+          </Button>
+        </div>
       </div>
     </div>
   );
