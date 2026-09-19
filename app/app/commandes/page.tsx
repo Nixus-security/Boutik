@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { listOrders } from "@/lib/data/orders";
 import { formatDate, formatPrice } from "@/lib/format";
+import { useCurrency } from "@/lib/currency-context";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -20,6 +21,7 @@ const FILTERS: { value: OrderStatus | "toutes"; label: string }[] = [
 ];
 
 export default function CommandesPage() {
+  const { currency } = useCurrency();
   const [orders, setOrders] = useState<Order[]>([]);
   const [filter, setFilter] = useState<OrderStatus | "toutes">("toutes");
   const [loading, setLoading] = useState(true);
@@ -88,7 +90,7 @@ export default function CommandesPage() {
               </div>
               <div className="mt-2 flex items-center justify-between">
                 <p className="text-xs text-gray-500">{formatDate(o.created_at)}</p>
-                <p className="text-sm font-bold text-gray-900">{formatPrice(o.total)}</p>
+                <p className="text-sm font-bold text-gray-900">{formatPrice(o.total, currency)}</p>
               </div>
             </Card>
           ))}

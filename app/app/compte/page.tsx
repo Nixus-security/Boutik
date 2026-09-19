@@ -7,6 +7,8 @@ import { createClient } from "@/lib/supabase/client";
 import { isDemo } from "@/lib/demo";
 import { passwordSchema } from "@/lib/schemas";
 import { type PlanSlug } from "@/lib/plans";
+import { CURRENCIES, DEFAULT_CURRENCY } from "@/lib/currency";
+import { useCurrency } from "@/lib/currency-context";
 import { Button } from "@/components/ui/Button";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Input } from "@/components/ui/Input";
@@ -22,11 +24,13 @@ const planLabels: Record<PlanSlug, string> = {
 export default function ComptePage() {
   const router = useRouter();
   const demo = isDemo();
+  const { setCurrency: setSharedCurrency } = useCurrency();
 
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState<string | null>(null);
   const [businessName, setBusinessName] = useState("");
   const [phone, setPhone] = useState("");
+  const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
   const [plan, setPlan] = useState<PlanSlug>("gratuit");
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
@@ -43,6 +47,7 @@ export default function ComptePage() {
         setEmail(account.email);
         setBusinessName(account.businessName);
         setPhone(account.phone);
+        setCurrency(account.currency);
         setPlan(account.plan);
       })
       .catch(() => setProfileError("Impossible de charger ton compte. Réessaie dans un instant."))
@@ -61,7 +66,8 @@ export default function ComptePage() {
 
     setSavingProfile(true);
     try {
-      await updateAccount({ businessName: businessName.trim(), phone: phone.trim() });
+      await updateAccount({ businessName: businessName.trim(), phone: phone.trim(), currency });
+      setSharedCurrency(currency);
       setProfileSaved(true);
     } catch {
       setProfileError("Impossible d'enregistrer ces informations. Réessaie.");
@@ -141,6 +147,27 @@ export default function ComptePage() {
             onChange={(e) => setPhone(e.target.value)}
             placeholder="Ex : 07 09 12 34 56"
           />
+
+          <div>
+            <label className="mb-1 block text-sm font-medium text-gray-700" htmlFor="currency-select">
+              Devise
+            </label>
+            <select
+              id="currency-select"
+              value={currency}
+              onChange={(e) => setCurrency(e.target.value)}
+              className="min-h-[44px] w-full rounded-xl border border-gray-200 bg-white px-4 py-3 text-base text-gray-900 focus:border-brand-500 focus:outline-none focus:ring-2 focus:ring-brand-100"
+            >
+              {CURRENCIES.map((c) => (
+                <option key={c.code} value={c.code}>
+                  {c.label}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-xs text-gray-500">
+              S'applique aux prix affichés dans l'app et sur ton catalogue.
+            </p>
+          </div>
 
           {profileError && (
             <p className="text-sm font-medium text-red-700" role="alert">

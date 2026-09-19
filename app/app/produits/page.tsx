@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { deleteProduct, listProducts } from "@/lib/data/products";
 import { formatPrice } from "@/lib/format";
+import { useCurrency } from "@/lib/currency-context";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -11,6 +12,7 @@ import { IconBox, IconClose } from "@/components/icons";
 import type { Product } from "@/lib/types";
 
 export default function ProduitsPage() {
+  const { currency } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -90,7 +92,7 @@ export default function ProduitsPage() {
                   {p.category || "Sans catégorie"} · Stock : {p.stock}
                 </p>
               </div>
-              <p className="text-sm font-bold text-brand-700">{formatPrice(p.price)}</p>
+              <p className="text-sm font-bold text-brand-700">{formatPrice(p.price, currency)}</p>
               <button
                 onClick={() => handleDelete(p.id)}
                 disabled={deletingId === p.id}

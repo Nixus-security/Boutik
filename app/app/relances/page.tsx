@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { listOrders, updateOrderStatus } from "@/lib/data/orders";
 import { daysSince, formatPrice } from "@/lib/format";
+import { useCurrency } from "@/lib/currency-context";
 import { relanceMessage, waMeLink } from "@/lib/whatsapp";
 import { Button } from "@/components/ui/Button";
 import { buttonBaseClass, buttonVariantClasses } from "@/components/ui/button-styles";
@@ -16,6 +17,7 @@ import type { Order } from "@/lib/types";
 const THRESHOLD_KEY = "boutik_relance_days";
 
 export default function RelancesPage() {
+  const { currency } = useCurrency();
   const [orders, setOrders] = useState<Order[]>([]);
   const [threshold, setThreshold] = useState(3);
   const [loading, setLoading] = useState(true);
@@ -98,11 +100,14 @@ export default function RelancesPage() {
                     <p className="text-xs text-red-700">Impayé depuis {daysSince(o.created_at)} jour(s)</p>
                   </div>
                 </div>
-                <p className="text-sm font-bold text-gray-900">{formatPrice(o.total)}</p>
+                <p className="text-sm font-bold text-gray-900">{formatPrice(o.total, currency)}</p>
               </div>
               <div className="mt-3 grid grid-cols-2 gap-2">
                 <a
-                  href={waMeLink(o.client_phone, relanceMessage({ clientName: o.client_name, amount: formatPrice(o.total) }))}
+                  href={waMeLink(
+                    o.client_phone,
+                    relanceMessage({ clientName: o.client_name, amount: formatPrice(o.total, currency) })
+                  )}
                   target="_blank"
                   rel="noreferrer"
                   className={`${buttonBaseClass} ${buttonVariantClasses.primary} text-xs`}

@@ -2,19 +2,27 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { demoStore, isDemo } from "@/lib/demo";
+import { DEFAULT_CURRENCY } from "@/lib/currency";
 import { PLAN_SLUGS, type PlanSlug } from "@/lib/plans";
 
 export type Account = {
   email: string | null;
   businessName: string;
   phone: string;
+  currency: string;
   plan: PlanSlug;
 };
 
 export async function getAccount(): Promise<Account> {
   if (isDemo()) {
     const profile = demoStore.getProfile();
-    return { email: null, businessName: profile.business_name ?? "", phone: profile.phone ?? "", plan: "gratuit" };
+    return {
+      email: null,
+      businessName: profile.business_name ?? "",
+      phone: profile.phone ?? "",
+      currency: profile.currency || DEFAULT_CURRENCY,
+      plan: "gratuit",
+    };
   }
 
   const supabase = createClient();
@@ -25,7 +33,7 @@ export async function getAccount(): Promise<Account> {
 
   const { data, error } = await supabase
     .from("profiles")
-    .select("business_name, phone")
+    .select("business_name, phone, currency")
     .eq("id", user.id)
     .single();
   if (error) throw error;
@@ -37,13 +45,14 @@ export async function getAccount(): Promise<Account> {
     email: user.email ?? null,
     businessName: data?.business_name ?? "",
     phone: data?.phone ?? "",
+    currency: data?.currency || DEFAULT_CURRENCY,
     plan,
   };
 }
 
-export async function updateAccount(patch: { businessName: string; phone: string }): Promise<void> {
+export async function updateAccount(patch: { businessName: string; phone: string; currency: string }): Promise<void> {
   if (isDemo()) {
-    demoStore.setProfile({ business_name: patch.businessName || null, phone: patch.phone || null });
+    demoStore.setProfile({ business_name: patch.businessName || null, phone: patch.phone || null, currency: patch.currency });
     return;
   }
 
@@ -55,7 +64,7 @@ export async function updateAccount(patch: { businessName: string; phone: string
 
   const { error } = await supabase
     .from("profiles")
-    .update({ business_name: patch.businessName || null, phone: patch.phone || null })
+    .update({ business_name: patch.businessName || null, phone: patch.phone || null, currency: patch.currency })
     .eq("id", user.id);
   if (error) throw error;
 }

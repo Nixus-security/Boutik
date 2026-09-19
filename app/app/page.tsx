@@ -5,12 +5,14 @@ import Link from "next/link";
 import { getProductCount } from "@/lib/data/products";
 import { listOrders } from "@/lib/data/orders";
 import { formatPrice } from "@/lib/format";
+import { useCurrency } from "@/lib/currency-context";
 import { Card } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
 import { IconBox, IconImage, IconPlus, IconUpload } from "@/components/icons";
 import type { Order } from "@/lib/types";
 
 export default function DashboardPage() {
+  const { currency } = useCurrency();
   const [productCount, setProductCount] = useState(0);
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
@@ -66,7 +68,7 @@ export default function DashboardPage() {
       {!loading && unpaid.length > 0 && (
         <Card className="border-red-200 bg-red-50">
           <p className="text-sm font-semibold text-red-800">
-            {formatPrice(unpaidTotal)} à récupérer auprès de {unpaid.length} client(s)
+            {formatPrice(unpaidTotal, currency)} à récupérer auprès de {unpaid.length} client(s)
           </p>
           <Link href="/app/relances" className="mt-2 inline-block text-sm font-semibold text-red-700 underline">
             Voir les relances à faire →

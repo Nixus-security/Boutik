@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { listProducts } from "@/lib/data/products";
 import { createOrder } from "@/lib/data/orders";
 import { formatPrice } from "@/lib/format";
+import { useCurrency } from "@/lib/currency-context";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import type { OrderStatus, PaymentMethod, Product } from "@/lib/types";
@@ -13,6 +14,7 @@ type LineItem = { product_id: string | null; product_name: string; quantity: num
 
 export default function NouvelleCommandePage() {
   const router = useRouter();
+  const { currency } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [items, setItems] = useState<LineItem[]>([]);
   const [clientName, setClientName] = useState("");
@@ -103,7 +105,7 @@ export default function NouvelleCommandePage() {
             </option>
             {products.map((p) => (
               <option key={p.id} value={p.id}>
-                {p.name} ({formatPrice(p.price)})
+                {p.name} ({formatPrice(p.price, currency)})
               </option>
             ))}
           </select>
@@ -162,7 +164,7 @@ export default function NouvelleCommandePage() {
 
       <div className="flex items-center justify-between rounded-xl bg-brand-50 px-4 py-3">
         <span className="text-sm font-semibold text-brand-800">Total</span>
-        <span className="text-lg font-extrabold text-brand-800">{formatPrice(total)}</span>
+        <span className="text-lg font-extrabold text-brand-800">{formatPrice(total, currency)}</span>
       </div>
 
       {/* Barre fixe (pas sticky) : sur mobile le contenu tient souvent tout juste dans la

@@ -7,6 +7,7 @@ import { getAccount } from "@/lib/data/profile";
 import { formatPrice } from "@/lib/format";
 import { waMeLink } from "@/lib/whatsapp";
 import { fileToResizedDataUrl } from "@/lib/image-resize";
+import { useCurrency } from "@/lib/currency-context";
 import {
   BORDERS,
   type BorderId,
@@ -32,6 +33,7 @@ const SHAPE_IDS = Object.keys(SHAPES) as ShapeId[];
 const BORDER_IDS = Object.keys(BORDERS) as BorderId[];
 
 export default function CataloguePage() {
+  const { currency } = useCurrency();
   const [products, setProducts] = useState<Product[]>([]);
   const [selected, setSelected] = useState<Set<string>>(new Set());
   const [format, setFormat] = useState<Format>("story");
@@ -133,7 +135,7 @@ export default function CataloguePage() {
     fetch("/api/catalogue/image", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ format, theme, shape, border, business: businessName, items, logo }),
+      body: JSON.stringify({ format, theme, shape, border, business: businessName, currency, items, logo }),
       signal: controller.signal,
     })
       .then((res) => {
@@ -147,7 +149,7 @@ export default function CataloguePage() {
       .finally(() => setGenerating(false));
 
     return () => controller.abort();
-  }, [products, selected, format, theme, shape, border, logo, businessName]);
+  }, [products, selected, format, theme, shape, border, logo, businessName, currency]);
 
   useEffect(() => {
     if (!imageBlob) {
@@ -382,7 +384,7 @@ export default function CataloguePage() {
                 )}
               </div>
               <span className="flex-1 text-sm font-medium text-gray-900">{p.name}</span>
-              <span className="text-sm font-bold text-brand-700">{formatPrice(p.price)}</span>
+              <span className="text-sm font-bold text-brand-700">{formatPrice(p.price, currency)}</span>
             </label>
           ))}
         </div>

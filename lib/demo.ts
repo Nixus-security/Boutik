@@ -5,9 +5,9 @@ const PRODUCTS_KEY = "boutik_demo_products";
 const ORDERS_KEY = "boutik_demo_orders";
 const PROFILE_KEY = "boutik_demo_profile";
 
-type DemoProfile = { business_name: string | null; phone: string | null };
+type DemoProfile = { business_name: string | null; phone: string | null; currency: string };
 
-const SEED_PROFILE: DemoProfile = { business_name: "Ma boutique démo", phone: null };
+const SEED_PROFILE: DemoProfile = { business_name: "Ma boutique démo", phone: null, currency: "FCFA" };
 
 const SEED_PRODUCTS: Product[] = [
   {
@@ -181,7 +181,7 @@ export const demoStore = {
   getProfile(): DemoProfile {
     if (typeof localStorage === "undefined") return SEED_PROFILE;
     const raw = localStorage.getItem(PROFILE_KEY);
-    return raw ? JSON.parse(raw) : SEED_PROFILE;
+    return raw ? { ...SEED_PROFILE, ...JSON.parse(raw) } : SEED_PROFILE;
   },
   setProfile(patch: Partial<DemoProfile>) {
     const current = demoStore.getProfile();
