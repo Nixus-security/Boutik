@@ -36,8 +36,8 @@ export async function POST(req: NextRequest) {
   const rows = Math.max(1, Math.ceil(items.length / columns));
   const headerHeight = format === "story" ? 135 : 126;
   const footerHeight = 134;
-  const safetyMargin = 200; // marge pour les approximations de hauteur du header/footer
-  const textBlockHeight = 68; // nom + prix + leurs marges
+  const safetyMargin = 150; // marge pour les approximations de hauteur du header/footer
+  const textBlockHeight = 112; // padding carte + nom + prix (pastille) + leurs marges
   const gridHeight = height - padding * 2 - headerHeight - footerHeight - safetyMargin;
   const rawPhotoHeight = (gridHeight - gap * (rows - 1)) / rows - textBlockHeight;
   const photoHeight = Math.round(Math.min(photoInnerWidth, Math.max(90, rawPhotoHeight)));
@@ -75,6 +75,7 @@ export async function POST(req: NextRequest) {
                 fontSize: format === "story" ? 56 : 48,
                 color: theme.headerColor,
                 fontWeight: 800,
+                letterSpacing: -1,
               }}
             >
               Notre catalogue
@@ -102,6 +103,7 @@ export async function POST(req: NextRequest) {
                 background: theme.cardBg,
                 borderRadius: shape.cardRadius,
                 border: border.width > 0 ? `${border.width}px solid ${theme.borderColor}` : "none",
+                boxShadow: "0 8px 20px rgba(0,0,0,0.16)",
                 padding: 18,
               }}
             >
@@ -112,7 +114,7 @@ export async function POST(req: NextRequest) {
                   height: photoHeight,
                   borderRadius: shape.chipRadius,
                   background: theme.chipBg,
-                  marginBottom: 12,
+                  marginBottom: 16,
                   alignItems: "center",
                   justifyContent: "center",
                   overflow: "hidden",
@@ -153,7 +155,19 @@ export async function POST(req: NextRequest) {
               >
                 {item.name.length > 26 ? item.name.slice(0, 24) + "…" : item.name}
               </div>
-              <div style={{ display: "flex", fontSize: 20, fontWeight: 800, color: theme.priceColor, marginTop: 8 }}>
+              <div
+                style={{
+                  display: "flex",
+                  alignSelf: "flex-start",
+                  fontSize: 18,
+                  fontWeight: 800,
+                  color: theme.priceColor,
+                  background: theme.chipBg,
+                  borderRadius: 999,
+                  padding: "4px 12px",
+                  marginTop: 8,
+                }}
+              >
                 {formatPrice(item.price, currency)}
               </div>
             </div>
@@ -171,6 +185,7 @@ export async function POST(req: NextRequest) {
             borderRadius: 999,
             padding: "16px 24px",
             alignSelf: "center",
+            boxShadow: "0 6px 16px rgba(0,0,0,0.18)",
           }}
         >
           <svg
