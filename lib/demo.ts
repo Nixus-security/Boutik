@@ -168,6 +168,10 @@ export const demoStore = {
       current.map((p) => (quantities.has(p.id) ? { ...p, stock: Math.max(0, p.stock - quantities.get(p.id)!) } : p))
     );
   },
+  updateProduct(id: string, patch: Partial<Product>) {
+    const current = demoStore.getProducts();
+    demoStore.setProducts(current.map((p) => (p.id === id ? { ...p, ...patch } : p)));
+  },
   getOrders(): Order[] {
     if (typeof localStorage === "undefined") return SEED_ORDERS;
     const raw = localStorage.getItem(ORDERS_KEY);

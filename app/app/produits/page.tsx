@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { deleteProduct, listProducts } from "@/lib/data/products";
 import { formatPrice } from "@/lib/format";
 import { useCurrency } from "@/lib/currency-context";
@@ -78,21 +79,23 @@ export default function ProduitsPage() {
         <div className="space-y-2">
           {products.map((p) => (
             <Card key={p.id} className="flex items-center gap-3">
-              <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-gray-50">
-                {p.photo_url ? (
-                  // eslint-disable-next-line @next/next/no-img-element -- data URL local, next/image ne s'applique pas ici
-                  <img src={p.photo_url} alt={p.name} className="h-full w-full object-cover" />
-                ) : (
-                  <IconBox className="h-5 w-5 text-gray-400" aria-hidden="true" />
-                )}
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-gray-900">{p.name}</p>
-                <p className="text-xs text-gray-500">
-                  {p.category || "Sans catégorie"} · Stock : {p.stock}
-                </p>
-              </div>
-              <p className="text-sm font-bold text-brand-700">{formatPrice(p.price, currency)}</p>
+              <Link href={`/app/produits/${p.id}`} className="flex min-w-0 flex-1 items-center gap-3">
+                <div className="flex h-11 w-11 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-gray-50">
+                  {p.photo_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- data URL local, next/image ne s'applique pas ici
+                    <img src={p.photo_url} alt={p.name} className="h-full w-full object-cover" />
+                  ) : (
+                    <IconBox className="h-5 w-5 text-gray-400" aria-hidden="true" />
+                  )}
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-semibold text-gray-900">{p.name}</p>
+                  <p className="text-xs text-gray-500">
+                    {p.category || "Sans catégorie"} · Stock : {p.stock}
+                  </p>
+                </div>
+                <p className="shrink-0 text-sm font-bold text-brand-700">{formatPrice(p.price, currency)}</p>
+              </Link>
               <button
                 onClick={() => handleDelete(p.id)}
                 disabled={deletingId === p.id}

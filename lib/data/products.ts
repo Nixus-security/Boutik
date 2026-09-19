@@ -62,6 +62,39 @@ export async function createProducts(newProducts: NewProduct[]): Promise<Product
   return data as Product[];
 }
 
+export async function getProduct(id: string): Promise<Product | null> {
+  if (isDemo()) return demoStore.getProducts().find((p) => p.id === id) ?? null;
+
+  const supabase = createClient();
+  const { data, error } = await supabase.from("products").select(PRODUCT_COLUMNS).eq("id", id).maybeSingle();
+  if (error) throw error;
+  return data as Product | null;
+}
+
+export async function updateProduct(id: string, patch: NewProduct): Promise<Product> {
+  const validated = productInputSchema.safeParse(patch);
+  if (!validated.success) {
+    throw new Error(`Produit invalide : ${validated.error.issues[0]?.message ?? "données incorrectes"}`);
+  }
+
+  if (isDemo()) {
+    demoStore.updateProduct(id, validated.data);
+    const updated = demoStore.getProducts().find((p) => p.id === id);
+    if (!updated) throw new Error("Produit introuvable");
+    return updated;
+  }
+
+  const supabase = createClient();
+  const { data, error } = await supabase
+    .from("products")
+    .update(validated.data)
+    .eq("id", id)
+    .select(PRODUCT_COLUMNS)
+    .single();
+  if (error) throw error;
+  return data as Product;
+}
+
 export async function deleteProduct(id: string): Promise<void> {
   if (isDemo()) {
     demoStore.setProducts(demoStore.getProducts().filter((p) => p.id !== id));
