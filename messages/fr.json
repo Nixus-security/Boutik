@@ -37,11 +37,107 @@
     "exit": "Quitter"
   },
   "landing": {
+    "eyebrow": "Votre boutique sur WhatsApp",
     "title": "Gère ta boutique WhatsApp en 2 minutes par jour",
     "subtitle": "Importe ton stock, génère ton catalogue automatiquement, et ne perds plus jamais un client qui ne t'a pas payé.",
+    "heroCta": "Tester en démo",
     "createAccount": "Créer mon compte gratuit",
     "haveAccount": "J'ai déjà un compte",
-    "tryDemo": "Tester sans compte (mode démo)"
+    "tryDemo": "Tester sans compte (mode démo)",
+    "phonePlaceholder": "Aperçu de l'app à venir",
+    "floatingBubble": "Tout ton business depuis WhatsApp",
+    "navFeatures": "Fonctionnalités",
+    "navPricing": "Tarifs",
+    "navTestimonials": "Témoignages",
+    "navFaq": "FAQ",
+    "checklist": ["Simple", "Rapide", "Fiable"],
+    "howItWorks": {
+      "title": "3 étapes simples",
+      "subtitle": "Pour vendre sur WhatsApp sans y passer tes journées",
+      "steps": [
+        { "title": "Importe ton stock", "description": "Ajoute tes produits depuis un fichier Excel ou à la main." },
+        { "title": "Partage ton catalogue", "description": "Boutik génère ton catalogue, prêt à envoyer sur WhatsApp." },
+        { "title": "Vends et relance", "description": "Suis tes commandes et relance les impayés en un clic." }
+      ]
+    },
+    "finalCta": {
+      "title": "Prêt à gérer ta boutique sur WhatsApp ?",
+      "subtitle": "Teste Boutik gratuitement, sans carte bancaire.",
+      "cta": "Tester en démo"
+    },
+    "features": {
+      "simple": { "title": "Simple et rapide", "description": "En quelques clics, ta boutique est prête." },
+      "reliable": { "title": "Fiable et sécurisé", "description": "Tes données et tes clients sont protégés." },
+      "everywhere": { "title": "Partout avec toi", "description": "Gère ton activité depuis ton téléphone." }
+    },
+    "featuresSection": {
+      "title": "Tout ce qu'il faut pour vendre sur WhatsApp",
+      "subtitle": "Pas de logiciel compliqué. Boutik s'occupe du catalogue, des relances et du suivi pendant que tu vends.",
+      "items": [
+        {
+          "title": "Catalogue automatique",
+          "description": "Importe ton stock depuis un fichier Excel, Boutik génère ton catalogue à partager sur WhatsApp."
+        },
+        {
+          "title": "Relances clients",
+          "description": "La liste des impayés se met à jour toute seule. Un clic ouvre WhatsApp avec un message déjà prêt, pas besoin de l'API Business."
+        },
+        {
+          "title": "Suivi des commandes",
+          "description": "Chaque commande garde son statut, du premier message client jusqu'au paiement."
+        },
+        {
+          "title": "Statistiques de ventes",
+          "description": "Chiffre d'affaires, produits qui marchent, clients qui reviennent : tout au même endroit."
+        }
+      ]
+    },
+    "testimonials": {
+      "title": "Ils gèrent déjà leur boutique avec Boutik",
+      "chatTitle": "Avis clients",
+      "chatStatus": "En ligne",
+      "items": [
+        {
+          "name": "Fatou",
+          "role": "Boutique de vêtements",
+          "quote": "Avant je notais les impayés sur un carnet. Maintenant Boutik me dit qui relancer chaque matin.",
+          "time": "09:14"
+        },
+        {
+          "name": "Ibrahima",
+          "role": "Vente de pièces détachées",
+          "quote": "Le catalogue se fait tout seul à partir de mon Excel. Je gagne une bonne heure par semaine.",
+          "time": "11:32"
+        },
+        {
+          "name": "Awa",
+          "role": "Cosmétiques",
+          "quote": "Mes clientes commandent directement depuis WhatsApp, je n'ai plus besoin d'un site à part.",
+          "time": "16:05"
+        }
+      ]
+    },
+    "faq": {
+      "title": "Questions fréquentes",
+      "items": [
+        {
+          "question": "Ai-je besoin de WhatsApp Business API ?",
+          "answer": "Non. Boutik ouvre WhatsApp avec un message prérempli, tu cliques sur envoyer. Aucune validation Meta Business n'est nécessaire."
+        },
+        {
+          "question": "Boutik est-il gratuit ?",
+          "answer": "Oui, l'offre Gratuit te permet de tester Boutik sur ta boutique. Tu passes à un forfait payant seulement quand tu veux plus de catalogues ou les relances automatiques."
+        },
+        {
+          "question": "Puis-je annuler à tout moment ?",
+          "answer": "Oui, sans engagement. Tu changes ou arrêtes ton forfait quand tu veux depuis ton compte."
+        },
+        {
+          "question": "Mes données clients sont-elles en sécurité ?",
+          "answer": "Tes données et celles de tes clients restent liées à ton compte uniquement et ne sont jamais partagées."
+        }
+      ]
+    }
   },
   "pricing": {
     "title": "Tarifs",

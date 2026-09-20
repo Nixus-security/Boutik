@@ -32,7 +32,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={baloo.variable}>
+    <html lang={locale} className={`${baloo.variable} scroll-smooth`}>
       <body className={baloo.className}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}

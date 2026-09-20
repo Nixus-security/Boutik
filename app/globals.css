@@ -33,6 +33,114 @@ textarea {
   animation: page-fade-in 180ms ease-out;
 }
 
+@keyframes step-wiggle {
+  0%,
+  100% {
+    transform: rotate(-10deg);
+  }
+  50% {
+    transform: rotate(10deg);
+  }
+}
+
+@keyframes step-float-up {
+  0% {
+    transform: translateY(0);
+    opacity: 0;
+  }
+  25% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-16px);
+    opacity: 0;
+  }
+}
+
+@keyframes step-bar-grow {
+  0%,
+  100% {
+    transform: scaleY(0.35);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+@keyframes sim-dot-bounce {
+  0%,
+  60%,
+  100% {
+    transform: translateY(0);
+    opacity: 0.5;
+  }
+  30% {
+    transform: translateY(-3px);
+    opacity: 1;
+  }
+}
+
+@keyframes sim-dots-out {
+  0%,
+  55% {
+    opacity: 1;
+  }
+  65%,
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes sim-ticks-in {
+  0%,
+  60% {
+    opacity: 0;
+    stroke-dashoffset: 12;
+  }
+  70% {
+    opacity: 1;
+    stroke-dashoffset: 12;
+  }
+  100% {
+    opacity: 1;
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes sim-pill-color {
+  0%,
+  45% {
+    background: #fef3c7;
+    color: #92400e;
+  }
+  55%,
+  100% {
+    background: #eefdf3;
+    color: #129756;
+  }
+}
+
+@keyframes sim-check-draw {
+  0%,
+  45% {
+    stroke-dashoffset: 10;
+  }
+  60%,
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+@keyframes sim-dot-pulse {
+  0%,
+  100% {
+    r: 2.5px;
+  }
+  50% {
+    r: 3.5px;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *,
   *::before,

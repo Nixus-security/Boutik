@@ -37,11 +37,107 @@
     "exit": "Exit"
   },
   "landing": {
+    "eyebrow": "Your shop on WhatsApp",
     "title": "Run your WhatsApp shop in 2 minutes a day",
     "subtitle": "Import your stock, generate your catalogue automatically, and never miss a client who hasn't paid.",
+    "heroCta": "Try the demo",
     "createAccount": "Create my free account",
     "haveAccount": "I already have an account",
-    "tryDemo": "Try without an account (demo mode)"
+    "tryDemo": "Try without an account (demo mode)",
+    "phonePlaceholder": "App preview coming soon",
+    "floatingBubble": "Your whole business from WhatsApp",
+    "navFeatures": "Features",
+    "navPricing": "Pricing",
+    "navTestimonials": "Testimonials",
+    "navFaq": "FAQ",
+    "checklist": ["Simple", "Fast", "Reliable"],
+    "howItWorks": {
+      "title": "3 simple steps",
+      "subtitle": "To sell on WhatsApp without losing your day to it",
+      "steps": [
+        { "title": "Import your stock", "description": "Add your products from an Excel file or by hand." },
+        { "title": "Share your catalogue", "description": "Boutik generates your catalogue, ready to send on WhatsApp." },
+        { "title": "Sell and follow up", "description": "Track your orders and chase unpaid clients in one click." }
+      ]
+    },
+    "finalCta": {
+      "title": "Ready to run your shop on WhatsApp?",
+      "subtitle": "Try Boutik for free, no card needed.",
+      "cta": "Try the demo"
+    },
+    "features": {
+      "simple": { "title": "Simple and fast", "description": "Your shop is ready in a few clicks." },
+      "reliable": { "title": "Reliable and secure", "description": "Your data and clients are protected." },
+      "everywhere": { "title": "With you everywhere", "description": "Run your business from your phone." }
+    },
+    "featuresSection": {
+      "title": "Everything you need to sell on WhatsApp",
+      "subtitle": "No complicated software. Boutik handles the catalogue, reminders and order tracking while you sell.",
+      "items": [
+        {
+          "title": "Automatic catalogue",
+          "description": "Import your stock from an Excel file, Boutik generates a catalogue you can share on WhatsApp."
+        },
+        {
+          "title": "Client reminders",
+          "description": "The unpaid list updates itself. One click opens WhatsApp with a message already written, no Business API needed."
+        },
+        {
+          "title": "Order tracking",
+          "description": "Every order keeps its status, from the first client message to payment."
+        },
+        {
+          "title": "Sales statistics",
+          "description": "Revenue, best-selling products, returning clients: all in one place."
+        }
+      ]
+    },
+    "testimonials": {
+      "title": "Shop owners already using Boutik",
+      "chatTitle": "Customer reviews",
+      "chatStatus": "Online",
+      "items": [
+        {
+          "name": "Fatou",
+          "role": "Clothing shop",
+          "quote": "I used to write down unpaid orders in a notebook. Now Boutik tells me who to follow up with every morning.",
+          "time": "09:14"
+        },
+        {
+          "name": "Ibrahima",
+          "role": "Spare parts shop",
+          "quote": "The catalogue builds itself from my Excel file. I save a good hour every week.",
+          "time": "11:32"
+        },
+        {
+          "name": "Awa",
+          "role": "Cosmetics",
+          "quote": "My clients order straight from WhatsApp, I don't need a separate website anymore.",
+          "time": "16:05"
+        }
+      ]
+    },
+    "faq": {
+      "title": "Frequently asked questions",
+      "items": [
+        {
+          "question": "Do I need the WhatsApp Business API?",
+          "answer": "No. Boutik opens WhatsApp with a pre-filled message, you just hit send. No Meta Business verification required."
+        },
+        {
+          "question": "Is Boutik free?",
+          "answer": "Yes, the Free plan lets you try Boutik on your shop. Move to a paid plan only when you want more catalogues or automatic reminders."
+        },
+        {
+          "question": "Can I cancel anytime?",
+          "answer": "Yes, no commitment. Change or stop your plan whenever you want from your account."
+        },
+        {
+          "question": "Is my client data safe?",
+          "answer": "Your data and your clients' data stay tied to your account only and are never shared."
+        }
+      ]
+    }
   },
   "pricing": {
     "title": "Pricing",
