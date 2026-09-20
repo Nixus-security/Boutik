@@ -137,7 +137,9 @@
     "generateCatalogue": "Générer mon catalogue",
     "generateCatalogueDesc": "Prêt pour WhatsApp en 3s",
     "newOrder": "Nouvelle commande",
-    "newOrderDesc": "Saisie manuelle rapide"
+    "newOrderDesc": "Saisie manuelle rapide",
+    "seeStats": "Voir mes statistiques",
+    "seeStatsDesc": "CA, stock, top produits"
   },
   "products": {
     "title": "Mes produits",
@@ -322,5 +324,26 @@
     "currentPlan": "Forfait actuel : {plan}",
     "seePricing": "Voir les tarifs",
     "logout": "Se déconnecter"
+  },
+  "stats": {
+    "title": "Statistiques",
+    "loadError": "Impossible de charger les statistiques. Réessaie dans un instant.",
+    "periodToday": "Aujourd'hui",
+    "period7d": "7 jours",
+    "period30d": "30 jours",
+    "periodAll": "Tout",
+    "revenue": "Chiffre d'affaires",
+    "ordersCount": "Commandes",
+    "unpaidCount": "Impayées",
+    "averageOrderValue": "Panier moyen",
+    "stockSection": "Stock",
+    "totalStockUnits": "Unités en stock",
+    "inventoryValue": "Valeur du stock",
+    "lowStockTitle": "Stock faible",
+    "lowStockEmpty": "Aucun produit en stock faible.",
+    "lowStockUnits": "{count} restant(s)",
+    "topProductsSection": "Produits les plus vendus",
+    "topProductsEmpty": "Aucune vente sur cette période.",
+    "unitsSold": "{count} vendu(s)"
   }
 }

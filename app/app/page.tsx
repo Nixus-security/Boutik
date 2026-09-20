@@ -9,7 +9,7 @@ import { formatPrice } from "@/lib/format";
 import { useCurrency } from "@/lib/currency-context";
 import { Card } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
-import { IconBox, IconImage, IconPlus, IconUpload } from "@/components/icons";
+import { IconBox, IconChart, IconImage, IconPlus, IconUpload } from "@/components/icons";
 import type { Order } from "@/lib/types";
 
 export default function DashboardPage() {
@@ -82,6 +82,12 @@ export default function DashboardPage() {
       <div>
         <p className="mb-2 text-sm font-semibold text-gray-700">{t("quickActions")}</p>
         <div className="space-y-2">
+          <QuickAction
+            href="/app/statistiques"
+            icon={IconChart}
+            title={t("seeStats")}
+            desc={t("seeStatsDesc")}
+          />
           <QuickAction
             href="/app/produits"
             icon={IconBox}

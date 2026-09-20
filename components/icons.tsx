@@ -161,6 +161,18 @@ export function IconPhone(props: IconProps) {
   );
 }
 
+export function IconChart(props: IconProps) {
+  return (
+    <svg {...base} {...props}>
+      <path d="M4 20V4" />
+      <path d="M4 20h16" />
+      <path d="M8 20v-6" />
+      <path d="M12.5 20V8" />
+      <path d="M17 20v-10" />
+    </svg>
+  );
+}
+
 export function IconSettings(props: IconProps) {
   return (
     <svg {...base} {...props}>
