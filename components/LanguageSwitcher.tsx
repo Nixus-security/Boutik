@@ -21,7 +21,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
         type="button"
         onClick={() => setLocale("fr")}
         aria-pressed={locale === "fr"}
-        className={`min-h-[32px] rounded-full px-2.5 ${locale === "fr" ? "bg-brand-500 text-white" : "text-gray-600"}`}
+        className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full px-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 ${locale === "fr" ? "bg-brand-700 text-white" : "text-gray-600"}`}
       >
         FR
       </button>
@@ -29,7 +29,7 @@ export function LanguageSwitcher({ className = "" }: { className?: string }) {
         type="button"
         onClick={() => setLocale("en")}
         aria-pressed={locale === "en"}
-        className={`min-h-[32px] rounded-full px-2.5 ${locale === "en" ? "bg-brand-500 text-white" : "text-gray-600"}`}
+        className={`flex min-h-[44px] min-w-[44px] items-center justify-center rounded-full px-2.5 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 ${locale === "en" ? "bg-brand-700 text-white" : "text-gray-600"}`}
       >
         EN
       </button>

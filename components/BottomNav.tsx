@@ -24,7 +24,7 @@ export function BottomNav() {
       <Link
         href="/app/produits/nouveau"
         aria-label={t("newProduct")}
-        className="absolute left-1/2 top-0 z-30 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-brand-500 text-white shadow-lg ring-4 ring-white active:bg-brand-600"
+        className="absolute left-1/2 top-0 z-30 flex h-14 w-14 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-brand-700 text-white shadow-lg ring-4 ring-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 active:bg-brand-800"
       >
         <IconPlus className="h-6 w-6" />
       </Link>
@@ -36,8 +36,8 @@ export function BottomNav() {
               <Link
                 href={item.href}
                 aria-current={active ? "page" : undefined}
-                className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-medium ${
-                  active ? "text-brand-600" : "text-gray-500"
+                className={`flex min-h-[44px] flex-col items-center justify-center gap-0.5 py-2 text-[11px] font-medium focus-visible:outline focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-brand-500 ${
+                  active ? "text-brand-700" : "text-gray-500"
                 }`}
               >
                 <item.icon className="h-5 w-5" />

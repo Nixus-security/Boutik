@@ -98,7 +98,7 @@ export default function NouveauProduitPage() {
             type="button"
             onClick={() => fileInputRef.current?.click()}
             disabled={uploadingPhoto}
-            className="min-h-[44px] flex-1 rounded-xl border border-dashed border-gray-300 px-3 text-xs font-semibold text-gray-600 disabled:opacity-60"
+            className="min-h-[44px] flex-1 rounded-xl border border-dashed border-gray-300 px-3 text-xs font-semibold text-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:opacity-60"
           >
             {uploadingPhoto ? t("importing") : photo ? t("changePhoto") : t("addPhoto")}
           </button>

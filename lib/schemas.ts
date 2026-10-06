@@ -1,6 +1,9 @@
 import { z } from "zod";
 import { borderIdSchema, shapeIdSchema, themeIdSchema } from "@/lib/catalogue-themes";
 
+// products.photo_url accepte aussi bien une data URL (upload direct, lib/image-resize.ts)
+// qu'une URL http(s) tapée dans un fichier Excel importé (voir lib/excel.ts) : affiché en
+// <img> par le navigateur du propriétaire, pas de risque serveur à laisser passer une URL ici.
 export const productInputSchema = z.object({
   name: z.string().trim().min(1, "Nom manquant").max(120, "Nom trop long"),
   price: z.number().finite().positive("Prix invalide").max(100_000_000),
@@ -8,6 +11,16 @@ export const productInputSchema = z.object({
   category: z.string().trim().max(60).nullable(),
   photo_url: z.string().trim().max(400_000, "Photo trop volumineuse").nullable(),
 });
+
+// À l'inverse, le rendu du catalogue (app/api/catalogue/image) fetche photo/logo CÔTÉ SERVEUR
+// (edge) pour les incruster dans l'image générée : une URL http(s) arbitraire y serait une SSRF.
+// On n'accepte donc ici que des data URLs base64 (ce que produit toujours l'upload direct) —
+// les photos issues d'une URL externe (import Excel) sont filtrées avant l'appel, voir
+// app/app/catalogue/page.tsx.
+const dataImageUrlSchema = z
+  .string()
+  .max(300_000, "Image trop volumineuse")
+  .regex(/^data:image\/(png|jpe?g|webp);base64,[A-Za-z0-9+/]+=*$/, "Format d'image invalide");
 
 export const orderItemInputSchema = z.object({
   product_id: z.string().nullable(),
@@ -32,15 +45,12 @@ export const orderInputSchema = z.object({
 export const catalogueItemSchema = z.object({
   name: z.string().trim().min(1).max(80),
   price: z.number().finite().nonnegative().max(100_000_000),
-  photo: z.string().trim().max(400_000).nullable().optional(),
+  photo: dataImageUrlSchema.nullable().optional(),
 });
 
 export const catalogueItemsSchema = z.array(catalogueItemSchema).max(24);
 
-export const catalogueLogoSchema = z
-  .string()
-  .regex(/^data:image\/(png|jpe?g|webp);base64,[A-Za-z0-9+/]+=*$/, "Format de logo invalide")
-  .max(300_000, "Le logo est trop volumineux");
+export const catalogueLogoSchema = dataImageUrlSchema.max(300_000, "Le logo est trop volumineux");
 
 export const catalogueRequestSchema = z.object({
   format: z.enum(["story", "liste"]).default("story"),

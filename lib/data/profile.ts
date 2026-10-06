@@ -2,8 +2,8 @@
 
 import { createClient } from "@/lib/supabase/client";
 import { demoStore, isDemo } from "@/lib/demo";
-import { DEFAULT_CURRENCY } from "@/lib/currency";
-import { PLAN_SLUGS, type PlanSlug } from "@/lib/plans";
+import { DEFAULT_CURRENCY, conversionFactor } from "@/lib/currency";
+import { resolveActivePlan, type PlanSlug } from "@/lib/plans";
 
 export type Account = {
   email: string | null;
@@ -31,15 +31,13 @@ export async function getAccount(): Promise<Account> {
   } = await supabase.auth.getUser();
   if (!user) throw new Error("Non connecté");
 
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("business_name, phone, currency")
-    .eq("id", user.id)
-    .single();
+  const [{ data, error }, { data: subscription }] = await Promise.all([
+    supabase.from("profiles").select("business_name, phone, currency").eq("id", user.id).single(),
+    supabase.from("subscriptions").select("plan, status, current_period_end").eq("user_id", user.id).maybeSingle(),
+  ]);
   if (error) throw error;
 
-  const metaPlan = user.user_metadata?.plan;
-  const plan: PlanSlug = PLAN_SLUGS.includes(metaPlan) ? metaPlan : "gratuit";
+  const plan = resolveActivePlan(subscription);
 
   return {
     email: user.email ?? null,
@@ -66,6 +64,25 @@ export async function updateAccount(patch: { businessName: string; phone: string
     .from("profiles")
     .update({ business_name: patch.businessName || null, phone: patch.phone || null, currency: patch.currency })
     .eq("id", user.id);
+  if (error) throw error;
+}
+
+export async function convertAccountCurrency(fromCurrency: string, toCurrency: string): Promise<void> {
+  const factor = conversionFactor(fromCurrency, toCurrency);
+  if (factor === 1) return;
+
+  if (isDemo()) {
+    demoStore.convertPrices(factor);
+    return;
+  }
+
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) throw new Error("Non connecté");
+
+  const { error } = await supabase.rpc("convert_user_currency", { p_user_id: user.id, p_factor: factor });
   if (error) throw error;
 }
 

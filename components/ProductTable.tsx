@@ -32,7 +32,7 @@ export function ProductTable({
             />
             <button
               onClick={() => onRemove(i)}
-              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-gray-500 active:bg-gray-100"
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 active:bg-gray-100"
               aria-label={t("removeLineAria")}
             >
               <IconClose className="h-4 w-4" />

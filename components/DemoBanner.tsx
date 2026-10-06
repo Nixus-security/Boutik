@@ -21,7 +21,7 @@ export function DemoBanner() {
       <span aria-hidden="true" />
       <span className="text-center">{t("banner")}</span>
       <button
-        className="flex min-h-[44px] items-center justify-self-end whitespace-nowrap px-2 underline"
+        className="flex min-h-[44px] items-center justify-self-end whitespace-nowrap px-2 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-amber-950"
         onClick={() => {
           exitDemo();
           router.push("/");

@@ -1,7 +1,9 @@
 import { ImageResponse } from "@vercel/og";
 import { NextRequest } from "next/server";
+import { createClient } from "@/lib/supabase/server";
 import { catalogueRequestSchema } from "@/lib/schemas";
 import { BORDERS, CATALOGUE_THEMES, SHAPES } from "@/lib/catalogue-themes";
+import { clientIp, rateLimit } from "@/lib/rate-limit";
 
 export const runtime = "edge";
 
@@ -10,6 +12,33 @@ function formatPrice(value: number, currency: string) {
 }
 
 export async function POST(req: NextRequest) {
+  // Génération d'image coûteuse (rendu edge) : réservée aux utilisateurs connectés ou en mode démo,
+  // pour ne pas laisser n'importe qui (même sans compte) la déclencher en boucle depuis l'extérieur.
+  // Le cookie démo est posé côté client (donc falsifiable) : il ouvre l'accès sans compte,
+  // mais ces appelants sont limités par IP, plus strictement que les comptes connectés.
+  const isDemo = req.cookies.get("boutik_demo")?.value === "1";
+  let rateKey: string;
+  let rateMax: number;
+  if (isDemo) {
+    rateKey = `catalogue-image:ip:${clientIp(req)}`;
+    rateMax = 10;
+  } else {
+    const supabase = await createClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    if (!user) {
+      return new Response("Non autorisé", { status: 401 });
+    }
+    rateKey = `catalogue-image:user:${user.id}`;
+    rateMax = 30;
+  }
+
+  const limit = rateLimit(rateKey, rateMax, 60_000);
+  if (!limit.ok) {
+    return new Response("Trop de requêtes", { status: 429, headers: { "Retry-After": String(limit.retryAfter) } });
+  }
+
   const body = await req.json().catch(() => null);
   const parsed = catalogueRequestSchema.safeParse(body);
 

@@ -22,6 +22,26 @@ Lors de la création ou modification de composants UI (React, Tailwind, CSS), re
 18. **Pas de mots en italique serif** au milieu de titres sans-serif.
 19. **Pas de combo de polices cliché** (Space Grotesk + Instrument Serif).
 20. **Pas de texture de bruit (grain) sur les dégradés**.
+1. privacy policy
+2. terms page
+3. clear CTA
+4. FAQ
+5. robots.txt
+6. sitemap.xml
+7. custom 404
+8. alt text
+9. analytics
+10. meta titles
+11. meta descirption
+12. social share
+13. favicon
+14. canonical URIs
+15. Cookie consents
+16. mobile version
+17. accessibility
+18. test forms
+19. check broken links
+20. optimize performace
 
 # Directives de Copywriting & Contenu (Anti-AI SLOP)
 Bannir le vocabulaire "ChatGPT/IA" clichées : Interdiction d'utiliser les mots/expressions : "Plongez dans", "Révolutionnaire", "Débloquez le potentiel", "Synergie", "Paysage numérique", "Phare d'espoir", "Tisser", "Incontournable".

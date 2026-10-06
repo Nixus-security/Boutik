@@ -3,15 +3,19 @@
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { listOrders, markRelanceSent, updateOrderStatus } from "@/lib/data/orders";
+import { getAccount } from "@/lib/data/profile";
 import { daysSince, formatPrice } from "@/lib/format";
 import { useCurrency } from "@/lib/currency-context";
 import { relanceMessage, waMeLink } from "@/lib/whatsapp";
+import { isDemo } from "@/lib/demo";
+import { RELANCES_MIN_PLAN, type PlanSlug } from "@/lib/plans";
 import { Button } from "@/components/ui/Button";
+import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Card } from "@/components/ui/Card";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { RelanceSkeletonList } from "@/components/ui/Skeleton";
 import { Avatar } from "@/components/ui/Avatar";
-import { IconCheckCircle } from "@/components/icons";
+import { IconCheckCircle, IconShield } from "@/components/icons";
 import type { Order } from "@/lib/types";
 
 const THRESHOLD_KEY = "boutik_relance_days";
@@ -30,15 +34,21 @@ export default function RelancesPage() {
   const [markingId, setMarkingId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [sequence, setSequence] = useState<{ list: Order[]; index: number } | null>(null);
+  const [plan, setPlan] = useState<PlanSlug>("gratuit");
 
   useEffect(() => {
     const saved = localStorage.getItem(THRESHOLD_KEY);
     if (saved) setThreshold(Number(saved));
+    getAccount()
+      .then((account) => setPlan(account.plan))
+      .catch(() => {});
     listOrders()
       .then(setOrders)
       .catch(() => setError(t("loadError")))
       .finally(() => setLoading(false));
   }, [t]);
+
+  const locked = !isDemo() && !RELANCES_MIN_PLAN.includes(plan);
 
   function saveThreshold(value: number) {
     const safeValue = Number.isFinite(value) && value > 0 ? Math.floor(value) : 1;
@@ -93,6 +103,20 @@ export default function RelancesPage() {
     const next = sequence.list[nextIndex];
     recordRelance(next);
     window.open(relanceHref(next), "_blank");
+  }
+
+  if (!loading && locked) {
+    return (
+      <div className="space-y-4 pb-4">
+        <h1 className="text-xl font-extrabold text-gray-900">{t("title")}</h1>
+        <EmptyState
+          icon={<IconShield className="h-10 w-10 text-gray-400" />}
+          title={t("lockedTitle")}
+          description={t("lockedDesc")}
+          action={<ButtonLink href="/tarifs">{t("lockedCta")}</ButtonLink>}
+        />
+      </div>
+    );
   }
 
   const toRelance = orders
@@ -186,7 +210,7 @@ export default function RelancesPage() {
                     target="_blank"
                     rel="noreferrer"
                     onClick={() => recordRelance(o)}
-                    className="flex min-h-[44px] items-center justify-center rounded-xl bg-brand-500 px-3 text-xs font-bold text-white active:bg-brand-600"
+                    className="flex min-h-[44px] items-center justify-center rounded-xl bg-brand-700 px-3 text-xs font-bold text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-700 active:bg-brand-800"
                   >
                     {t("relaunch")}
                   </a>

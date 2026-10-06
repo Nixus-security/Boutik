@@ -1,10 +1,10 @@
 export type ButtonVariant = "primary" | "secondary" | "ghost" | "danger";
 
 export const buttonVariantClasses: Record<ButtonVariant, string> = {
-  primary: "bg-brand-500 text-white active:bg-brand-600 disabled:bg-brand-200",
+  primary: "bg-brand-700 text-white active:bg-brand-800 disabled:bg-brand-200",
   secondary: "bg-white text-gray-900 border border-gray-200 active:bg-gray-50",
-  ghost: "bg-transparent text-brand-600 active:bg-brand-50",
-  danger: "bg-red-500 text-white active:bg-red-600",
+  ghost: "bg-transparent text-brand-700 active:bg-brand-50",
+  danger: "bg-red-600 text-white active:bg-red-700",
 };
 
 export const buttonBaseClass =

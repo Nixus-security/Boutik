@@ -45,6 +45,7 @@
     "haveAccount": "J'ai déjà un compte",
     "tryDemo": "Tester sans compte (mode démo)",
     "phonePlaceholder": "Aperçu de l'app à venir",
+    "heroImageAlt": "Aperçu de l'application Boutik : liste de commandes reçues sur WhatsApp",
     "floatingBubble": "Tout ton business depuis WhatsApp",
     "navFeatures": "Fonctionnalités",
     "navPricing": "Tarifs",
@@ -135,6 +136,22 @@
         {
           "question": "Mes données clients sont-elles en sécurité ?",
           "answer": "Tes données et celles de tes clients restent liées à ton compte uniquement et ne sont jamais partagées."
+        },
+        {
+          "question": "Comment je paie mon abonnement ?",
+          "answer": "Par carte bancaire (Stripe) ou par Mobile Money (Orange Money, MTN, Wave...). Le paiement Mobile Money couvre 30 jours et se renouvelle manuellement."
+        },
+        {
+          "question": "Ça marche dans quels pays ?",
+          "answer": "Boutik s'utilise partout où WhatsApp fonctionne. Tu choisis ta devise d'affichage (FCFA, Naira, Cedi, Dirham, Euro...) depuis ton compte."
+        },
+        {
+          "question": "Que se passe-t-il si je dépasse la limite de mon forfait ?",
+          "answer": "Sur le forfait Gratuit, tu peux générer 1 catalogue par mois. Passe à Essentiel ou Pro pour plus de catalogues et les relances automatiques."
+        },
+        {
+          "question": "Comment contacter le support ?",
+          "answer": "Écris à boutik.contact.support@gmail.com, on te répond directement."
         }
       ]
     }
@@ -143,6 +160,8 @@
     "title": "Tarifs",
     "subtitle": "Commence gratuitement. Passe à un forfait payant quand ta boutique grandit. Annule quand tu veux.",
     "mostChosen": "Le plus choisi",
+    "mobileMoney": "Payer par Mobile Money",
+    "mobileMoneySoon": "Mobile Money : bientôt disponible",
     "perMonth": "/mois",
     "questionPrefix": "Une question sur les forfaits ?",
     "contact": "Contacte-nous",
@@ -178,6 +197,8 @@
     "forgotPassword": "Mot de passe oublié ?",
     "invalidCredentials": "Email ou mot de passe incorrect.",
     "submit": "Se connecter",
+    "orSeparator": "ou",
+    "continueWithGoogle": "Continuer avec Google",
     "noAccount": "Pas encore de compte ?",
     "signup": "Inscris-toi"
   },
@@ -189,6 +210,8 @@
     "email": "Email",
     "password": "Mot de passe",
     "submit": "Créer mon compte",
+    "orSeparator": "ou",
+    "continueWithGoogle": "S'inscrire avec Google",
     "haveAccount": "Déjà un compte ?",
     "login": "Connecte-toi",
     "error": "Impossible de créer le compte. Réessaie dans un instant.",
@@ -286,6 +309,7 @@
     "chooseFileLabel": "Choisir un fichier (.xlsx, .xls, .csv, .ods)",
     "columnsHint": "Colonnes : nom, prix, quantité, catégorie",
     "emptyFile": "Aucune ligne trouvée dans ce fichier.",
+    "tooManyRows": "Ce fichier contient {count} lignes, maximum {max} par import. Sépare-le en plusieurs fichiers.",
     "readError": "Impossible de lire ce fichier. Formats acceptés : .xlsx, .xls, .csv, .ods.",
     "title": "Importer mon stock",
     "subtitle": "Fichier .xlsx, .xls, .csv ou .ods avec les colonnes : nom produit, prix, quantité stock, catégorie (photo optionnelle).",
@@ -304,6 +328,7 @@
     "title": "Commandes",
     "newOrder": "Nouvelle commande",
     "loadError": "Impossible de charger tes commandes. Réessaie dans un instant.",
+    "statusUpdateError": "Impossible de mettre à jour le statut. Réessaie.",
     "filterAll": "Toutes",
     "filterPending": "En attente",
     "filterUnpaid": "Impayées",
@@ -349,7 +374,10 @@
     "remindedAgo": "Relancé il y a {days} jour(s)",
     "relaunch": "Relancer",
     "markPaid": "Marquer payé",
-    "markPaidError": "Impossible de mettre à jour cette commande. Réessaie."
+    "markPaidError": "Impossible de mettre à jour cette commande. Réessaie.",
+    "lockedTitle": "Fonctionnalité Essentiel",
+    "lockedDesc": "Les relances clients sont disponibles à partir du forfait Essentiel.",
+    "lockedCta": "Voir les forfaits"
   },
   "catalogue": {
     "title": "Mon catalogue",
@@ -375,6 +403,11 @@
     "download": "Télécharger l'image",
     "share": "Partager sur WhatsApp",
     "generateError": "Impossible de générer l'aperçu. Réessaie.",
+    "usageCount": "{count}/{limit} catalogues utilisés ce mois-ci",
+    "usageUnlimited": "Catalogues illimités",
+    "limitReachedTitle": "Limite de ton forfait atteinte",
+    "limitReachedDesc": "Passe à un forfait supérieur pour télécharger ou partager plus de catalogues ce mois-ci.",
+    "limitReachedCta": "Voir les forfaits",
     "includedProducts": "Produits inclus ({selected}/{total})",
     "themes": {
       "vert": "Vert",
@@ -395,6 +428,12 @@
       "epaisse": "Épaisse"
     }
   },
+  "footer": {
+    "legalNav": "Liens légaux",
+    "privacy": "Politique de confidentialité",
+    "terms": "Conditions générales d'utilisation",
+    "copyright": "© {year} Boutik"
+  },
   "account": {
     "title": "Mon compte",
     "shopSection": "Ma boutique",
@@ -404,7 +443,9 @@
     "phone": "Téléphone (optionnel)",
     "phonePlaceholder": "Ex : 07 09 12 34 56",
     "currency": "Devise",
-    "currencyHint": "S'applique aux prix affichés dans l'app et sur ton catalogue.",
+    "currencyHint": "En changeant de devise, tous tes prix existants (produits et commandes) sont convertis automatiquement avec un taux approximatif.",
+    "currencyChangeConfirm": "Tous tes prix de produits et commandes vont être convertis de {from} vers {to} (taux approximatif). Continuer ?",
+    "currencyConvertError": "Les informations sont enregistrées, mais la conversion des prix a échoué. Réessaie depuis cette page.",
     "loadError": "Impossible de charger ton compte. Réessaie dans un instant.",
     "businessNameRequired": "Le nom de la boutique est requis.",
     "saveError": "Impossible d'enregistrer ces informations. Réessaie.",
@@ -418,6 +459,15 @@
     "changePassword": "Changer le mot de passe",
     "subscriptionSection": "Abonnement",
     "currentPlan": "Forfait actuel : {plan}",
+    "upgradeTo": "Passer à {plan}",
+    "payByCard": "Carte bancaire",
+    "payByMobileMoney": "Mobile Money",
+    "manageBilling": "Gérer mon abonnement",
+    "cancelSubscription": "Résilier mon abonnement",
+    "cancelConfirm": "Résilier ton abonnement {plan} ? Tu repasseras immédiatement au forfait Gratuit, sans remboursement.",
+    "cancelError": "Impossible de résilier l'abonnement. Réessaie dans un instant.",
+    "cancelSuccess": "Abonnement résilié. Tu es maintenant au forfait Gratuit.",
+    "billingError": "Impossible de contacter le paiement. Réessaie dans un instant.",
     "seePricing": "Voir les tarifs",
     "logout": "Se déconnecter"
   },
@@ -440,6 +490,9 @@
     "lowStockUnits": "{count} restant(s)",
     "topProductsSection": "Produits les plus vendus",
     "topProductsEmpty": "Aucune vente sur cette période.",
-    "unitsSold": "{count} vendu(s)"
+    "unitsSold": "{count} vendu(s)",
+    "lockedTitle": "Fonctionnalité Pro",
+    "lockedDesc": "Les statistiques de vente sont disponibles avec le forfait Pro.",
+    "lockedCta": "Voir les forfaits"
   }
 }

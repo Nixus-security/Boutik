@@ -1,7 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import { Baloo_2 } from "next/font/google";
+import { headers } from "next/headers";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
+import { CookieConsent } from "@/components/CookieConsent";
+import { Analytics } from "@/components/Analytics";
 import "./globals.css";
 
 const baloo = Baloo_2({
@@ -20,6 +23,12 @@ export const metadata: Metadata = {
     description: "Gère ta boutique WhatsApp en 2 minutes par jour.",
     images: ["/logo.jpg"],
   },
+  twitter: {
+    card: "summary_large_image",
+    title: "Boutik",
+    description: "Gère ta boutique WhatsApp en 2 minutes par jour.",
+    images: ["/logo.jpg"],
+  },
 };
 
 export const viewport: Viewport = {
@@ -30,12 +39,15 @@ export const viewport: Viewport = {
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   const messages = await getMessages();
+  const nonce = (await headers()).get("x-nonce") ?? undefined;
 
   return (
     <html lang={locale} className={`${baloo.variable} scroll-smooth`}>
       <body className={baloo.className}>
         <NextIntlClientProvider locale={locale} messages={messages}>
           {children}
+          <CookieConsent />
+          <Analytics nonce={nonce} />
         </NextIntlClientProvider>
       </body>
     </html>

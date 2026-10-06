@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { parseInventoryFile, type ParsedRow } from "@/lib/excel";
+import { MAX_IMPORT_ROWS, parseInventoryFile, TooManyRowsError, type ParsedRow } from "@/lib/excel";
 import { IconUpload } from "@/components/icons";
 
 export function ExcelUploader({ onParsed }: { onParsed: (rows: ParsedRow[]) => void }) {
@@ -22,7 +22,11 @@ export function ExcelUploader({ onParsed }: { onParsed: (rows: ParsedRow[]) => v
       }
       onParsed(rows);
     } catch (e) {
-      setError(t("readError"));
+      if (e instanceof TooManyRowsError) {
+        setError(t("tooManyRows", { count: e.count, max: MAX_IMPORT_ROWS }));
+      } else {
+        setError(t("readError"));
+      }
     } finally {
       setLoading(false);
     }
@@ -47,7 +51,7 @@ export function ExcelUploader({ onParsed }: { onParsed: (rows: ParsedRow[]) => v
         onClick={() => inputRef.current?.click()}
         disabled={loading}
         aria-busy={loading || undefined}
-        className="flex min-h-[44px] w-full flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50 px-6 py-10 text-center active:bg-brand-100 disabled:opacity-60"
+        className="flex min-h-[44px] w-full flex-col items-center justify-center gap-2 rounded-2xl border-2 border-dashed border-brand-300 bg-brand-50 px-6 py-10 text-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 active:bg-brand-100 disabled:opacity-60"
       >
         <IconUpload className="h-8 w-8 text-brand-600" />
         <span className="text-sm font-semibold text-brand-700">

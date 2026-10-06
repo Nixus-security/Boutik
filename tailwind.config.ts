@@ -25,6 +25,15 @@ const config: Config = {
       fontFamily: {
         sans: ["system-ui", "-apple-system", "Segoe UI", "Roboto", "sans-serif"],
       },
+      keyframes: {
+        marquee: {
+          from: { transform: "translateX(0)" },
+          to: { transform: "translateX(calc(-100% - 1rem))" },
+        },
+      },
+      animation: {
+        marquee: "marquee var(--duration,30s) linear infinite",
+      },
     },
   },
   plugins: [],

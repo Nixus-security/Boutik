@@ -4,10 +4,16 @@ import { useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 import { listProducts } from "@/lib/data/products";
 import { listOrders } from "@/lib/data/orders";
+import { getAccount } from "@/lib/data/profile";
 import { formatPrice } from "@/lib/format";
 import { useCurrency } from "@/lib/currency-context";
+import { isDemo } from "@/lib/demo";
+import { STATS_MIN_PLAN, type PlanSlug } from "@/lib/plans";
 import { Card } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
+import { EmptyState } from "@/components/ui/EmptyState";
+import { ButtonLink } from "@/components/ui/ButtonLink";
+import { IconShield } from "@/components/icons";
 import type { Order, Product } from "@/lib/types";
 
 type Period = "today" | "7d" | "30d" | "all";
@@ -32,8 +38,12 @@ export default function StatistiquesPage() {
   const [period, setPeriod] = useState<Period>("7d");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [plan, setPlan] = useState<PlanSlug>("gratuit");
 
   useEffect(() => {
+    getAccount()
+      .then((account) => setPlan(account.plan))
+      .catch(() => {});
     Promise.all([listProducts(), listOrders()])
       .then(([p, o]) => {
         setProducts(p);
@@ -42,6 +52,8 @@ export default function StatistiquesPage() {
       .catch(() => setError(t("loadError")))
       .finally(() => setLoading(false));
   }, [t]);
+
+  const locked = !isDemo() && !STATS_MIN_PLAN.includes(plan);
 
   const periodOrders = useMemo(() => {
     const start = periodStartMs(period);
@@ -93,6 +105,20 @@ export default function StatistiquesPage() {
       <p className="text-sm font-medium text-red-700" role="alert">
         {error}
       </p>
+    );
+  }
+
+  if (locked) {
+    return (
+      <div className="space-y-4 pb-4">
+        <h1 className="text-xl font-extrabold text-gray-900">{t("title")}</h1>
+        <EmptyState
+          icon={<IconShield className="h-10 w-10 text-gray-400" />}
+          title={t("lockedTitle")}
+          description={t("lockedDesc")}
+          action={<ButtonLink href="/tarifs">{t("lockedCta")}</ButtonLink>}
+        />
+      </div>
     );
   }
 
@@ -186,8 +212,8 @@ function PeriodChip({ active, onClick, label }: { active: boolean; onClick: () =
     <button
       onClick={onClick}
       aria-pressed={active}
-      className={`min-h-[44px] shrink-0 rounded-full px-4 text-xs font-semibold ${
-        active ? "bg-brand-500 text-white" : "border border-gray-200 bg-white text-gray-600"
+      className={`min-h-[44px] shrink-0 rounded-full px-4 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 ${
+        active ? "bg-brand-700 text-white" : "border border-gray-200 bg-white text-gray-600"
       }`}
     >
       {label}

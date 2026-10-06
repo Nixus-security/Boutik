@@ -26,9 +26,13 @@ export async function updateSession(request: NextRequest) {
     }
   );
 
+  // getSession() lit la session depuis le cookie, sans aller-retour réseau vers Supabase Auth
+  // (contrairement à getUser()) : ce contrôle ne sert qu'à rediriger côté UI, l'autorisation
+  // réelle sur les données est de toute façon revalidée par les policies RLS à chaque requête.
   const {
-    data: { user },
-  } = await supabase.auth.getUser();
+    data: { session },
+  } = await supabase.auth.getSession();
+  const user = session?.user ?? null;
 
   const path = request.nextUrl.pathname;
   const isDemo = request.cookies.get("boutik_demo")?.value === "1";

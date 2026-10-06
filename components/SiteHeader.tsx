@@ -11,7 +11,10 @@ export function SiteHeader() {
 
   return (
     <header className="flex items-center justify-between">
-      <Link href="/" className="flex items-center">
+      <Link
+        href="/"
+        className="flex items-center focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+      >
         <Image src={logoFull} alt="Boutik" width={48} height={48} className="h-12 w-12" priority />
       </Link>
       <div className="flex items-center gap-2">

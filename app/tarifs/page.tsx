@@ -1,13 +1,15 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { getTranslations } from "next-intl/server";
-import { ButtonLink } from "@/components/ui/ButtonLink";
+import { PricingCta } from "@/components/PricingCta";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SiteFooter } from "@/components/SiteFooter";
 import { type PlanSlug } from "@/lib/plans";
 
 export const metadata: Metadata = {
   title: "Tarifs : Boutik",
   description: "Choisis le forfait Boutik adapté à ta boutique WhatsApp. Sans engagement.",
+  alternates: { canonical: "/tarifs" },
 };
 
 type Plan = {
@@ -24,6 +26,8 @@ type Plan = {
 export default async function TarifsPage() {
   const t = await getTranslations("pricing");
   const tPlans = await getTranslations("plans");
+  const tAccount = await getTranslations("account");
+  const billingError = tAccount("billingError");
 
   const plans: Plan[] = [
     {
@@ -67,7 +71,13 @@ export default async function TarifsPage() {
 
         <div className="mt-8 grid grid-cols-1 gap-4 md:grid-cols-3 md:gap-6">
           {plans.map((plan) => (
-            <PlanCard key={plan.name} plan={plan} mostChosenLabel={t("mostChosen")} />
+            <PlanCard
+              key={plan.name}
+              plan={plan}
+              mostChosenLabel={t("mostChosen")}
+              billingError={billingError}
+              mobileMoneyLabel={t("mobileMoney")}
+            />
           ))}
         </div>
 
@@ -77,12 +87,24 @@ export default async function TarifsPage() {
             {t("contact")}
           </Link>
         </p>
+
+        <SiteFooter />
       </div>
     </main>
   );
 }
 
-function PlanCard({ plan, mostChosenLabel }: { plan: Plan; mostChosenLabel: string }) {
+function PlanCard({
+  plan,
+  mostChosenLabel,
+  billingError,
+  mobileMoneyLabel,
+}: {
+  plan: Plan;
+  mostChosenLabel: string;
+  billingError: string;
+  mobileMoneyLabel: string;
+}) {
   return (
     <article
       className={`flex flex-col rounded-2xl bg-white p-5 shadow-sm ${
@@ -110,13 +132,13 @@ function PlanCard({ plan, mostChosenLabel }: { plan: Plan; mostChosenLabel: stri
         ))}
       </ul>
 
-      <ButtonLink
-        href={`/inscription?plan=${plan.slug}`}
-        variant={plan.highlighted ? "primary" : "secondary"}
-        className="mt-5"
-      >
-        {plan.cta}
-      </ButtonLink>
+      <PricingCta
+        slug={plan.slug}
+        label={plan.cta}
+        highlighted={plan.highlighted}
+        billingError={billingError}
+        mobileMoneyLabel={mobileMoneyLabel}
+      />
     </article>
   );
 }

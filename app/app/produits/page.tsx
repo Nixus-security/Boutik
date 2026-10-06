@@ -101,7 +101,7 @@ export default function ProduitsPage() {
               <button
                 onClick={() => handleDelete(p.id)}
                 disabled={deletingId === p.id}
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-gray-500 active:bg-gray-100 disabled:opacity-50"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg text-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 active:bg-gray-100 disabled:opacity-50"
                 aria-label={t("deleteAria", { name: p.name })}
               >
                 <IconClose className="h-4 w-4" />

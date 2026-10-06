@@ -201,4 +201,15 @@ export const demoStore = {
     const current = demoStore.getProfile();
     localStorage.setItem(PROFILE_KEY, JSON.stringify({ ...current, ...patch }));
   },
+  convertPrices(factor: number) {
+    const round2 = (n: number) => Math.round(n * 100) / 100;
+    demoStore.setProducts(demoStore.getProducts().map((p) => ({ ...p, price: round2(p.price * factor) })));
+    demoStore.setOrders(
+      demoStore.getOrders().map((o) => ({
+        ...o,
+        total: round2(o.total * factor),
+        items: o.items.map((i) => ({ ...i, unit_price: round2(i.unit_price * factor) })),
+      }))
+    );
+  },
 };

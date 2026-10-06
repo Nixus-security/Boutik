@@ -128,7 +128,7 @@ export default function NouvelleCommandePage() {
                   type="button"
                   onClick={() => updateQuantity(i, item.quantity - 1)}
                   aria-label={t("decreaseAria", { name: item.product_name })}
-                  className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-600 active:bg-gray-200"
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 active:bg-gray-200"
                 >
                   −
                 </button>
@@ -139,7 +139,7 @@ export default function NouvelleCommandePage() {
                   type="button"
                   onClick={() => updateQuantity(i, item.quantity + 1)}
                   aria-label={t("increaseAria", { name: item.product_name })}
-                  className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-600 active:bg-gray-200"
+                  className="flex h-11 w-11 items-center justify-center rounded-full bg-gray-100 text-lg font-bold text-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 active:bg-gray-200"
                 >
                   +
                 </button>
@@ -206,7 +206,7 @@ function ChoiceButton({ active, onClick, label }: { active: boolean; onClick: ()
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`min-h-[44px] rounded-xl border px-3 py-2 text-xs font-semibold ${
+      className={`min-h-[44px] rounded-xl border px-3 py-2 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 ${
         active ? "border-brand-500 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-500"
       }`}
     >

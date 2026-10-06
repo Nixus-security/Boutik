@@ -3,18 +3,26 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
-import { getAccount, updateAccount, changePassword } from "@/lib/data/profile";
+import { getAccount, updateAccount, changePassword, convertAccountCurrency } from "@/lib/data/profile";
 import { createClient } from "@/lib/supabase/client";
 import { isDemo } from "@/lib/demo";
 import { passwordSchema } from "@/lib/schemas";
 import { type PlanSlug } from "@/lib/plans";
 import { CURRENCIES, DEFAULT_CURRENCY } from "@/lib/currency";
 import { useCurrency } from "@/lib/currency-context";
+import { IconPhone } from "@/components/icons";
+import { MobileMoneySoon } from "@/components/MobileMoneySoon";
+import { MOBILE_MONEY_ENABLED } from "@/lib/features";
 import { Button } from "@/components/ui/Button";
 import { ButtonLink } from "@/components/ui/ButtonLink";
 import { Input } from "@/components/ui/Input";
 import { Card } from "@/components/ui/Card";
 import { Skeleton } from "@/components/ui/Skeleton";
+
+const PLAN_PRICES: Record<"essentiel" | "pro", string> = {
+  essentiel: "3€",
+  pro: "10€",
+};
 
 export default function ComptePage() {
   const router = useRouter();
@@ -23,12 +31,14 @@ export default function ComptePage() {
   const t = useTranslations("account");
   const tPlans = useTranslations("plans");
   const tCurrency = useTranslations("currency");
+  const tPricing = useTranslations("pricing");
 
   const [loading, setLoading] = useState(true);
   const [email, setEmail] = useState<string | null>(null);
   const [businessName, setBusinessName] = useState("");
   const [phone, setPhone] = useState("");
   const [currency, setCurrency] = useState(DEFAULT_CURRENCY);
+  const [loadedCurrency, setLoadedCurrency] = useState(DEFAULT_CURRENCY);
   const [plan, setPlan] = useState<PlanSlug>("gratuit");
   const [savingProfile, setSavingProfile] = useState(false);
   const [profileSaved, setProfileSaved] = useState(false);
@@ -39,6 +49,11 @@ export default function ComptePage() {
   const [passwordSaved, setPasswordSaved] = useState(false);
   const [passwordError, setPasswordError] = useState<string | null>(null);
 
+  const [redirecting, setRedirecting] = useState<`${PlanSlug}:${"stripe" | "fedapay"}` | "portal" | null>(null);
+  const [billingError, setBillingError] = useState<string | null>(null);
+  const [canceling, setCanceling] = useState(false);
+  const [cancelSuccess, setCancelSuccess] = useState(false);
+
   useEffect(() => {
     getAccount()
       .then((account) => {
@@ -46,6 +61,7 @@ export default function ComptePage() {
         setBusinessName(account.businessName);
         setPhone(account.phone);
         setCurrency(account.currency);
+        setLoadedCurrency(account.currency);
         setPlan(account.plan);
       })
       .catch(() => setProfileError(t("loadError")))
@@ -62,13 +78,26 @@ export default function ComptePage() {
       return;
     }
 
+    const currencyChanged = currency !== loadedCurrency;
+    if (currencyChanged && !confirm(t("currencyChangeConfirm", { from: loadedCurrency, to: currency }))) {
+      return;
+    }
+
     setSavingProfile(true);
     try {
       await updateAccount({ businessName: businessName.trim(), phone: phone.trim(), currency });
       setSharedCurrency(currency);
+
+      if (currencyChanged) {
+        await convertAccountCurrency(loadedCurrency, currency).catch(() => {
+          throw new Error("convert-failed");
+        });
+        setLoadedCurrency(currency);
+      }
+
       setProfileSaved(true);
-    } catch {
-      setProfileError(t("saveError"));
+    } catch (err) {
+      setProfileError(err instanceof Error && err.message === "convert-failed" ? t("currencyConvertError") : t("saveError"));
     } finally {
       setSavingProfile(false);
     }
@@ -94,6 +123,56 @@ export default function ComptePage() {
       setPasswordError(t("passwordError"));
     } finally {
       setSavingPassword(false);
+    }
+  }
+
+  async function handleUpgrade(targetPlan: "essentiel" | "pro", provider: "stripe" | "fedapay") {
+    setBillingError(null);
+    setRedirecting(`${targetPlan}:${provider}`);
+    try {
+      const res = await fetch(`/api/${provider}/checkout`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ plan: targetPlan }),
+      });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error();
+      window.location.href = data.url;
+    } catch {
+      setBillingError(t("billingError"));
+      setRedirecting(null);
+    }
+  }
+
+  async function handleManageBilling() {
+    setBillingError(null);
+    setRedirecting("portal");
+    try {
+      const res = await fetch("/api/stripe/portal", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok || !data.url) throw new Error();
+      window.location.href = data.url;
+    } catch {
+      setBillingError(t("billingError"));
+      setRedirecting(null);
+    }
+  }
+
+  async function handleCancelSubscription() {
+    if (!confirm(t("cancelConfirm", { plan: tPlans(plan) }))) return;
+
+    setBillingError(null);
+    setCancelSuccess(false);
+    setCanceling(true);
+    try {
+      const res = await fetch("/api/subscriptions/cancel", { method: "POST" });
+      if (!res.ok) throw new Error();
+      setPlan("gratuit");
+      setCancelSuccess(true);
+    } catch {
+      setBillingError(t("cancelError"));
+    } finally {
+      setCanceling(false);
     }
   }
 
@@ -218,7 +297,79 @@ export default function ComptePage() {
         <p className="text-sm text-gray-600">
           {t("currentPlan", { plan: tPlans(plan) })}
         </p>
-        <ButtonLink href="/tarifs" variant="secondary">
+
+        {billingError && (
+          <p className="text-sm font-medium text-red-700" role="alert">
+            {billingError}
+          </p>
+        )}
+
+        {!demo && plan === "gratuit" && (
+          <div className="space-y-3">
+            {(["essentiel", "pro"] as const).map((targetPlan) => (
+              <div key={targetPlan} className="rounded-2xl border border-gray-200 p-4">
+                <div className="flex items-baseline justify-between gap-2">
+                  <p className="text-sm font-bold text-gray-900">{tPlans(targetPlan)}</p>
+                  <p className="text-sm font-semibold text-gray-700">
+                    {PLAN_PRICES[targetPlan]}
+                    <span className="font-normal text-gray-500">{tPricing("perMonth")}</span>
+                  </p>
+                </div>
+                <div className="mt-3 flex flex-col gap-2 sm:flex-row">
+                  <Button
+                    type="button"
+                    onClick={() => handleUpgrade(targetPlan, "stripe")}
+                    loading={redirecting === `${targetPlan}:stripe`}
+                    disabled={redirecting !== null}
+                    className="flex-1"
+                  >
+                    {t("payByCard")}
+                  </Button>
+                  {MOBILE_MONEY_ENABLED ? (
+                    <Button
+                      type="button"
+                      variant="secondary"
+                      onClick={() => handleUpgrade(targetPlan, "fedapay")}
+                      loading={redirecting === `${targetPlan}:fedapay`}
+                      disabled={redirecting !== null}
+                      className="flex-1 gap-2"
+                    >
+                      <IconPhone className="h-4 w-4" />
+                      {t("payByMobileMoney")}
+                    </Button>
+                  ) : (
+                    <MobileMoneySoon className="flex-1" />
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+
+        {cancelSuccess && (
+          <p className="text-sm font-medium text-brand-700" role="status">
+            {t("cancelSuccess")}
+          </p>
+        )}
+
+        {!demo && plan !== "gratuit" && (
+          <div className="space-y-2">
+            <Button type="button" variant="secondary" onClick={handleManageBilling} loading={redirecting === "portal"} disabled={redirecting !== null || canceling}>
+              {t("manageBilling")}
+            </Button>
+            <Button
+              type="button"
+              variant="danger"
+              onClick={handleCancelSubscription}
+              loading={canceling}
+              disabled={redirecting !== null || canceling}
+            >
+              {t("cancelSubscription")}
+            </Button>
+          </div>
+        )}
+
+        <ButtonLink href="/tarifs" variant="ghost">
           {t("seePricing")}
         </ButtonLink>
       </Card>
@@ -226,7 +377,7 @@ export default function ComptePage() {
       <button
         type="button"
         onClick={handleLogout}
-        className="min-h-[44px] w-full rounded-xl px-4 py-3 text-center text-sm font-semibold text-red-700"
+        className="min-h-[44px] w-full rounded-xl px-4 py-3 text-center text-sm font-semibold text-red-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
       >
         {t("logout")}
       </button>

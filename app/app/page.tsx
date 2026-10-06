@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactElement } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { getProductCount } from "@/lib/data/products";
@@ -125,7 +125,7 @@ function QuickAction({
   desc,
 }: {
   href: string;
-  icon: (props: { className?: string }) => JSX.Element;
+  icon: (props: { className?: string }) => ReactElement;
   title: string;
   desc: string;
 }) {

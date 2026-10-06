@@ -1,24 +1,9 @@
 const createNextIntlPlugin = require("next-intl/plugin");
 const withNextIntl = createNextIntlPlugin("./i18n/request.ts");
 
-const isDev = process.env.NODE_ENV === "development";
-
-const scriptSrc = isDev ? "'self' 'unsafe-eval' 'unsafe-inline'" : "'self'";
-
-const csp = [
-  "default-src 'self'",
-  `script-src ${scriptSrc}`,
-  "style-src 'self' 'unsafe-inline'",
-  "img-src 'self' data: blob: https://*.supabase.co",
-  "font-src 'self' data:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co",
-  "frame-ancestors 'none'",
-  "base-uri 'self'",
-  "form-action 'self'",
-].join("; ");
-
+// La CSP est posée par middleware.ts (nonce par requête, voir lib/csp.ts).
 const securityHeaders = [
-  { key: "Content-Security-Policy", value: csp },
+  { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
   { key: "X-Content-Type-Options", value: "nosniff" },
   { key: "X-Frame-Options", value: "DENY" },
   { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
@@ -27,13 +12,12 @@ const securityHeaders = [
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  poweredByHeader: false,
   images: {
-    remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "**.supabase.co",
-      },
-    ],
+    // Images locales uniquement (imports statiques) : pas d'optimisation d'URL distantes,
+    // et pas d'AVIF (surface d'attaque de l'optimiseur d'images).
+    remotePatterns: [],
+    formats: ["image/webp"],
   },
   async headers() {
     return [

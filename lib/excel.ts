@@ -43,6 +43,14 @@ function toNumber(value: unknown): number {
   return Number.isFinite(n) ? n : 0;
 }
 
+export const MAX_IMPORT_ROWS = 2000;
+
+export class TooManyRowsError extends Error {
+  constructor(public count: number) {
+    super(`Fichier trop volumineux : ${count} lignes (max ${MAX_IMPORT_ROWS})`);
+  }
+}
+
 export async function parseInventoryFile(file: File): Promise<ParsedRow[]> {
   const buffer = await file.arrayBuffer();
   const workbook = XLSX.read(buffer, { type: "array", codepage: 65001 });
@@ -50,6 +58,7 @@ export async function parseInventoryFile(file: File): Promise<ParsedRow[]> {
   const rows = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet, { defval: "" });
 
   if (rows.length === 0) return [];
+  if (rows.length > MAX_IMPORT_ROWS) throw new TooManyRowsError(rows.length);
 
   const headers = Object.keys(rows[0]);
   const nameCol = matchColumn(headers, "name");

@@ -45,6 +45,7 @@
     "haveAccount": "I already have an account",
     "tryDemo": "Try without an account (demo mode)",
     "phonePlaceholder": "App preview coming soon",
+    "heroImageAlt": "Preview of the Boutik app: list of orders received on WhatsApp",
     "floatingBubble": "Your whole business from WhatsApp",
     "navFeatures": "Features",
     "navPricing": "Pricing",
@@ -135,6 +136,22 @@
         {
           "question": "Is my client data safe?",
           "answer": "Your data and your clients' data stay tied to your account only and are never shared."
+        },
+        {
+          "question": "How do I pay for my subscription?",
+          "answer": "By card (Stripe) or Mobile Money (Orange Money, MTN, Wave...). Mobile Money payments cover 30 days and renew manually."
+        },
+        {
+          "question": "Which countries does it work in?",
+          "answer": "Boutik works anywhere WhatsApp does. Pick your display currency (FCFA, Naira, Cedi, Dirham, Euro...) from your account."
+        },
+        {
+          "question": "What happens if I go over my plan's limit?",
+          "answer": "The Free plan lets you generate 1 catalogue per month. Move to Essentiel or Pro for more catalogues and automatic reminders."
+        },
+        {
+          "question": "How do I contact support?",
+          "answer": "Email boutik.contact.support@gmail.com, we'll answer directly."
         }
       ]
     }
@@ -143,6 +160,8 @@
     "title": "Pricing",
     "subtitle": "Start for free. Move to a paid plan as your shop grows. Cancel anytime.",
     "mostChosen": "Most chosen",
+    "mobileMoney": "Pay with Mobile Money",
+    "mobileMoneySoon": "Mobile Money: coming soon",
     "perMonth": "/month",
     "questionPrefix": "Question about the plans?",
     "contact": "Contact us",
@@ -178,6 +197,8 @@
     "forgotPassword": "Forgot your password?",
     "invalidCredentials": "Incorrect email or password.",
     "submit": "Log in",
+    "orSeparator": "or",
+    "continueWithGoogle": "Continue with Google",
     "noAccount": "Don't have an account yet?",
     "signup": "Sign up"
   },
@@ -189,6 +210,8 @@
     "email": "Email",
     "password": "Password",
     "submit": "Create my account",
+    "orSeparator": "or",
+    "continueWithGoogle": "Sign up with Google",
     "haveAccount": "Already have an account?",
     "login": "Log in",
     "error": "Couldn't create the account. Try again in a moment.",
@@ -286,6 +309,7 @@
     "chooseFileLabel": "Choose a file (.xlsx, .xls, .csv, .ods)",
     "columnsHint": "Columns: name, price, quantity, category",
     "emptyFile": "No rows found in this file.",
+    "tooManyRows": "This file has {count} rows, {max} max per import. Split it into several files.",
     "readError": "Couldn't read this file. Accepted formats: .xlsx, .xls, .csv, .ods.",
     "title": "Import my stock",
     "subtitle": ".xlsx, .xls, .csv or .ods file with columns: product name, price, stock quantity, category (photo optional).",
@@ -304,6 +328,7 @@
     "title": "Orders",
     "newOrder": "New order",
     "loadError": "Couldn't load your orders. Try again in a moment.",
+    "statusUpdateError": "Couldn't update the status. Try again.",
     "filterAll": "All",
     "filterPending": "Pending",
     "filterUnpaid": "Unpaid",
@@ -349,7 +374,10 @@
     "remindedAgo": "Reminded {days} day(s) ago",
     "relaunch": "Remind",
     "markPaid": "Mark as paid",
-    "markPaidError": "Couldn't update this order. Try again."
+    "markPaidError": "Couldn't update this order. Try again.",
+    "lockedTitle": "Essentiel feature",
+    "lockedDesc": "Client reminders are available from the Essentiel plan.",
+    "lockedCta": "See plans"
   },
   "catalogue": {
     "title": "My catalogue",
@@ -375,6 +403,11 @@
     "download": "Download image",
     "share": "Share on WhatsApp",
     "generateError": "Couldn't generate the preview. Try again.",
+    "usageCount": "{count}/{limit} catalogues used this month",
+    "usageUnlimited": "Unlimited catalogues",
+    "limitReachedTitle": "Plan limit reached",
+    "limitReachedDesc": "Move to a higher plan to download or share more catalogues this month.",
+    "limitReachedCta": "See plans",
     "includedProducts": "Products included ({selected}/{total})",
     "themes": {
       "vert": "Green",
@@ -395,6 +428,12 @@
       "epaisse": "Thick"
     }
   },
+  "footer": {
+    "legalNav": "Legal links",
+    "privacy": "Privacy policy",
+    "terms": "Terms of service",
+    "copyright": "© {year} Boutik"
+  },
   "account": {
     "title": "My account",
     "shopSection": "My shop",
@@ -404,7 +443,9 @@
     "phone": "Phone (optional)",
     "phonePlaceholder": "E.g.: 07 09 12 34 56",
     "currency": "Currency",
-    "currencyHint": "Applies to prices shown in the app and on your catalogue.",
+    "currencyHint": "Changing currency automatically converts all your existing prices (products and orders) at an approximate rate.",
+    "currencyChangeConfirm": "All your product and order prices will be converted from {from} to {to} (approximate rate). Continue?",
+    "currencyConvertError": "Your information was saved, but converting the prices failed. Try again from this page.",
     "loadError": "Couldn't load your account. Try again in a moment.",
     "businessNameRequired": "The shop name is required.",
     "saveError": "Couldn't save this information. Try again.",
@@ -418,6 +459,15 @@
     "changePassword": "Change password",
     "subscriptionSection": "Subscription",
     "currentPlan": "Current plan: {plan}",
+    "upgradeTo": "Upgrade to {plan}",
+    "payByCard": "Card",
+    "payByMobileMoney": "Mobile Money",
+    "manageBilling": "Manage subscription",
+    "cancelSubscription": "Cancel subscription",
+    "cancelConfirm": "Cancel your {plan} subscription? You'll immediately switch back to the Free plan, no refund.",
+    "cancelError": "Couldn't cancel the subscription. Try again in a moment.",
+    "cancelSuccess": "Subscription canceled. You're now on the Free plan.",
+    "billingError": "Couldn't reach billing. Try again in a moment.",
     "seePricing": "See pricing",
     "logout": "Log out"
   },
@@ -440,6 +490,9 @@
     "lowStockUnits": "{count} left",
     "topProductsSection": "Best-selling products",
     "topProductsEmpty": "No sales in this period.",
-    "unitsSold": "{count} sold"
+    "unitsSold": "{count} sold",
+    "lockedTitle": "Pro feature",
+    "lockedDesc": "Sales statistics are available with the Pro plan.",
+    "lockedCta": "See plans"
   }
 }

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { listOrders } from "@/lib/data/orders";
+import { listOrders, updateOrderStatus } from "@/lib/data/orders";
 import { formatDate, formatPrice } from "@/lib/format";
 import { useCurrency } from "@/lib/currency-context";
 import { ButtonLink } from "@/components/ui/ButtonLink";
@@ -22,6 +22,7 @@ export default function CommandesPage() {
   const [filter, setFilter] = useState<OrderStatus | "toutes">("toutes");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
 
   const FILTERS: { value: OrderStatus | "toutes"; label: string }[] = [
     { value: "toutes", label: t("filterAll") },
@@ -38,6 +39,21 @@ export default function CommandesPage() {
   }, [t]);
 
   const filtered = filter === "toutes" ? orders : orders.filter((o) => o.status === filter);
+
+  async function changeStatus(id: string, status: OrderStatus) {
+    const previous = orders;
+    setOrders((prev) => prev.map((o) => (o.id === id ? { ...o, status } : o)));
+    setUpdatingId(id);
+    setError(null);
+    try {
+      await updateOrderStatus(id, status);
+    } catch {
+      setOrders(previous);
+      setError(t("statusUpdateError"));
+    } finally {
+      setUpdatingId(null);
+    }
+  }
 
   return (
     <div className="space-y-4 pb-4">
@@ -59,8 +75,8 @@ export default function CommandesPage() {
             key={f.value}
             onClick={() => setFilter(f.value)}
             aria-pressed={filter === f.value}
-            className={`min-h-[44px] rounded-full px-4 text-xs font-semibold ${
-              filter === f.value ? "bg-brand-500 text-white" : "border border-gray-200 bg-white text-gray-600"
+            className={`min-h-[44px] rounded-full px-4 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 ${
+              filter === f.value ? "bg-brand-700 text-white" : "border border-gray-200 bg-white text-gray-600"
             }`}
           >
             {f.label}
@@ -89,7 +105,11 @@ export default function CommandesPage() {
                     <p className="text-xs text-gray-500">{o.client_phone}</p>
                   </div>
                 </div>
-                <StatusBadge status={o.status} />
+                <StatusBadge
+                  status={o.status}
+                  disabled={updatingId === o.id}
+                  onChange={(status) => changeStatus(o.id, status)}
+                />
               </div>
               <div className="mt-2 flex items-center justify-between">
                 <p className="text-xs text-gray-500">{formatDate(o.created_at, locale)}</p>

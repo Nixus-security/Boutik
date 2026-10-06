@@ -5,10 +5,12 @@ import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { listProducts } from "@/lib/data/products";
 import { getAccount } from "@/lib/data/profile";
+import { getCatalogueUsage, recordCatalogueUsage, type CatalogueUsage } from "@/lib/data/catalogueUsage";
 import { formatPrice } from "@/lib/format";
 import { waMeLink } from "@/lib/whatsapp";
 import { fileToResizedDataUrl } from "@/lib/image-resize";
 import { useCurrency } from "@/lib/currency-context";
+import { type PlanSlug } from "@/lib/plans";
 import {
   BORDERS,
   type BorderId,
@@ -56,6 +58,9 @@ export default function CataloguePage() {
   const [downloading, setDownloading] = useState(false);
   const [sharing, setSharing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [plan, setPlan] = useState<PlanSlug>("gratuit");
+  const [usage, setUsage] = useState<CatalogueUsage | null>(null);
+  const [limitError, setLimitError] = useState(false);
   const logoInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -76,6 +81,8 @@ export default function CataloguePage() {
     getAccount()
       .then((account) => {
         if (account.businessName) setBusinessName(account.businessName);
+        setPlan(account.plan);
+        getCatalogueUsage(account.plan).then(setUsage).catch(() => {});
       })
       .catch(() => {
         // nom de boutique par défaut conservé si le profil est indisponible
@@ -126,7 +133,13 @@ export default function CataloguePage() {
   useEffect(() => {
     const items = products
       .filter((p) => selected.has(p.id))
-      .map((p) => ({ name: p.name, price: p.price, photo: p.photo_url }));
+      .map((p) => ({
+        name: p.name,
+        price: p.price,
+        // Le rendu serveur n'accepte que des data URLs (voir lib/schemas.ts) : une photo importée
+        // depuis une URL externe (Excel) est simplement omise ici plutôt que de casser tout le rendu.
+        photo: p.photo_url?.startsWith("data:image/") ? p.photo_url : null,
+      }));
 
     if (items.length === 0) {
       setImageBlob(null);
@@ -166,10 +179,22 @@ export default function CataloguePage() {
     return () => URL.revokeObjectURL(url);
   }, [imageBlob]);
 
-  function handleDownload() {
+  async function checkUsageAllowed(): Promise<boolean> {
+    setLimitError(false);
+    const allowed = await recordCatalogueUsage(plan);
+    if (!allowed) {
+      setLimitError(true);
+      return false;
+    }
+    setUsage((prev) => (prev ? { ...prev, count: prev.count + 1 } : prev));
+    return true;
+  }
+
+  async function handleDownload() {
     if (!imageBlob) return;
     setDownloading(true);
     try {
+      if (!(await checkUsageAllowed())) return;
       const url = URL.createObjectURL(imageBlob);
       const a = document.createElement("a");
       a.href = url;
@@ -185,6 +210,7 @@ export default function CataloguePage() {
     if (!imageBlob) return;
     setSharing(true);
     try {
+      if (!(await checkUsageAllowed())) return;
       const file = new File([imageBlob], "catalogue.png", { type: "image/png" });
 
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
@@ -236,7 +262,10 @@ export default function CataloguePage() {
     <div className="space-y-4 pb-4">
       <div className="flex items-center justify-between">
         <h1 className="text-xl font-extrabold text-gray-900">{t("title")}</h1>
-        <Link href="/app/produits" className="text-sm font-semibold text-brand-700 underline">
+        <Link
+          href="/app/produits"
+          className="text-sm font-semibold text-brand-700 underline focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500"
+        >
           {t("seeProducts")}
         </Link>
       </div>
@@ -277,7 +306,7 @@ export default function CataloguePage() {
                 aria-pressed={theme === id}
                 aria-label={tThemes(id)}
                 title={tThemes(id)}
-                className={`flex h-11 w-11 items-center justify-center rounded-full border-2 ${
+                className={`flex h-11 w-11 items-center justify-center rounded-full border-2 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 ${
                   theme === id ? "border-gray-900" : "border-transparent"
                 }`}
               >
@@ -332,7 +361,7 @@ export default function CataloguePage() {
               type="button"
               onClick={() => logoInputRef.current?.click()}
               disabled={uploadingLogo}
-              className="min-h-[44px] flex-1 rounded-xl border border-dashed border-gray-300 px-3 text-xs font-semibold text-gray-600 disabled:opacity-60"
+              className="min-h-[44px] flex-1 rounded-xl border border-dashed border-gray-300 px-3 text-xs font-semibold text-gray-600 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 disabled:opacity-60"
             >
               {uploadingLogo ? t("importing") : logo ? t("changeLogo") : t("addLogo")}
             </button>
@@ -340,7 +369,7 @@ export default function CataloguePage() {
               <button
                 type="button"
                 onClick={removeLogo}
-                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-gray-500 active:bg-gray-100"
+                className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-gray-500 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 active:bg-gray-100"
                 aria-label={t("removeLogoAria")}
               >
                 <IconClose className="h-4 w-4" />
@@ -356,6 +385,20 @@ export default function CataloguePage() {
       </div>
 
       <div className="space-y-2">
+        {usage && (
+          <p className="text-xs font-medium text-gray-500">
+            {usage.limit === null ? t("usageUnlimited") : t("usageCount", { count: usage.count, limit: usage.limit })}
+          </p>
+        )}
+        {limitError && (
+          <div className="rounded-xl border border-amber-200 bg-amber-50 p-3">
+            <p className="text-sm font-semibold text-amber-900">{t("limitReachedTitle")}</p>
+            <p className="mt-0.5 text-xs text-amber-800">{t("limitReachedDesc")}</p>
+            <ButtonLink href="/tarifs" variant="secondary" className="mt-2">
+              {t("limitReachedCta")}
+            </ButtonLink>
+          </div>
+        )}
         <Button onClick={handleDownload} disabled={!imageBlob || generating} loading={downloading}>
           {t("download")}
         </Button>
@@ -383,7 +426,7 @@ export default function CataloguePage() {
               <div className="flex h-9 w-9 shrink-0 items-center justify-center overflow-hidden rounded-lg border border-gray-100 bg-gray-50">
                 {p.photo_url ? (
                   // eslint-disable-next-line @next/next/no-img-element -- data URL local, next/image ne s'applique pas ici
-                  <img src={p.photo_url} alt="" className="h-full w-full object-cover" />
+                  <img src={p.photo_url} alt={p.name} className="h-full w-full object-cover" />
                 ) : (
                   <IconImage className="h-4 w-4 text-gray-400" aria-hidden="true" />
                 )}
@@ -403,7 +446,7 @@ function FormatButton({ active, onClick, label }: { active: boolean; onClick: ()
     <button
       onClick={onClick}
       aria-pressed={active}
-      className={`min-h-[44px] flex-1 rounded-xl border px-3 py-2 text-xs font-semibold ${
+      className={`min-h-[44px] flex-1 rounded-xl border px-3 py-2 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 ${
         active ? "border-brand-500 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-500"
       }`}
     >
@@ -417,7 +460,7 @@ function ChoiceChip({ active, onClick, label }: { active: boolean; onClick: () =
     <button
       onClick={onClick}
       aria-pressed={active}
-      className={`min-h-[44px] flex-1 rounded-xl border px-2 py-2 text-xs font-semibold ${
+      className={`min-h-[44px] flex-1 rounded-xl border px-2 py-2 text-xs font-semibold focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-500 ${
         active ? "border-brand-500 bg-brand-50 text-brand-700" : "border-gray-200 bg-white text-gray-500"
       }`}
     >
